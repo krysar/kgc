@@ -6,6 +6,7 @@
 #define PIN_CS1 17 // LOAD (CS)
 #define PIN_CS2 5 // LOAD (CS)
 #define SPI_PORT spi0
+#define SPI_BAUDRATE 10000
 
 #define REG_NOOP        0x00
 #define REG_DIGIT0      0x01

@@ -14,6 +14,7 @@
 #pragma ide diagnostic ignored "EndlessLoop"
 
 bool timer_handler(struct repeating_timer *t);
+
 int64_t reg1 = 0, reg2 = 0, reg3 = 0; // displays registers
 uint8_t hrs, min, sec, milisec100;
 
@@ -37,7 +38,7 @@ int main() {
 
     secchoice:
     while(true) {
-        switch(section) {
+        /*switch(section) {
             case 0: {
                 switch (command) {
                     case 0: //no-op
@@ -102,14 +103,70 @@ int main() {
                 reg1 = 4321;
                 reg2 = 1234;
                 reg3 = 9876;
+        }*/
+
+        switch (program) {
+            case 0: //no-op
+                //keypad_status = 0;
+                reg1 = 0;
+                reg2 = 0;
+                reg3 = 0;
+                while (keypad_status == 0) {
+
+                }
+                break;
+            case 1: // stopwatch
+                //keypad_status = 0;
+                reg1 = 0, reg2 = 0, reg3 = 0;
+                milisec100 = 0, sec = 0, min = 0, hrs = 0;
+                //keypad_status = 0;
+                while (keypad_status == 0) {
+                    if (milisec100 >= 10) { // 100 ms = 1 sec
+                        sec++;
+                        milisec100 = 0;
+                        if (sec == 60) {
+                            min++;
+                            sec = 0;
+                            if (min == 60) {
+                                hrs++;
+                                min = 0;
+                            }
+                        }
+                    }
+                    reg1 = sec;
+                    reg2 = min;
+                    reg3 = hrs;
+                }
+                break;
+            case 2: //odpocet
+                reg1 = 0, reg2 = 0, reg3 = 0;
+                milisec100 = 10, sec = 60;
+                while (keypad_status == 0) {
+                    if (milisec100 == 0) {
+                        sec--;
+                        if (sec == 0)
+                            sec = 60;
+                    }
+                    reg2 = sec;
+                }
+                break;
+            case 100:
+                reg1 = 1111;
+                reg2 = 22222;
+                reg3 = 333333;
+                break;
+            default:
+                reg1 = 4321;
+                reg2 = 1234;
+                reg3 = 9876;
         }
     }
 }
 
 bool timer_handler(struct repeating_timer *t) {
-    if((section == 0) && (command == 1))
+    if (program == 1)
         milisec100++;
-    if((section == 0) && (command == 2))
+    if (program == 2)
         milisec100--;
     display_number(0, 1, reg1);
     display_number(1, 0, reg2);
