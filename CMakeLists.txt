@@ -7,10 +7,13 @@ set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 add_executable(kgc kgc.c max7219.h max7219.c keypad.h keypad.c)
 
-target_link_libraries(kgc pico_stdlib)
-target_link_libraries(kgc hardware_spi)
-target_link_libraries(kgc pico_binary_info)
-target_link_libraries(kgc m)
+target_link_libraries(kgc
+    pico_stdlib
+        hardware_spi
+        pico_binary_info
+        m
+        pico_multicore
+)
 
 
 pico_enable_stdio_usb(kgc 1)

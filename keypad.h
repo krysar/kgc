@@ -5,10 +5,10 @@
 #define KEY_COMMAND 11
 #define KEY_ENTER   15
 
-extern uint8_t keypad_status, section, command;
-extern uint8_t program[], prev_program[];
+extern uint8_t keypad_status, verb, noun;
+//extern uint8_t program[], prev_program[];
 extern bool debounce;
-extern uint8_t section_choice[], command_choice[];
+extern uint8_t verb_choice[], noun_choice[];
 static uint8_t col[4] = {28, 27, 26, 22}, row[4] = {21, 20, 16, 15};
 static uint8_t keymap[4][4] = {{1,  2, 3,  10},
                                {4,  5, 6,  11},

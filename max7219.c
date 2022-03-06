@@ -69,16 +69,27 @@ void max7219_init() {
         spi_send_data(i, REG_SCANLIMIT, 0x07);
         // We have own code table
         spi_send_data(i, REG_DECODEMODE, 0x00);
-        clear_display(i);
+        clear_display(i, 0);
+        clear_display(i, 1);
         // Activate shutdown mode
         spi_send_data(i, REG_SHUTDOWN, 0x00);
     }
 }
 
-void clear_display(uint8_t chip) {
-    for(register uint8_t i = 1; i <= 8; i++) {
-        spi_send_data(chip, i, CODE_BLANK);
-    }
+void clear_display(uint8_t chip, uint8_t display) {
+    if((chip == 0) || (chip == 1)) {
+        if (display == 0) {
+            for (register uint8_t i = 1; i <= 4; i++) {
+                spi_send_data(chip, i, CODE_BLANK);
+            }
+        } else if (display == 1) {
+            for (register uint8_t i = 5; i <= 8; i++) {
+                spi_send_data(chip, i, CODE_BLANK);
+            }
+        } else
+            return;
+    } else
+        return;
 }
 
 uint16_t dec2bin(uint8_t n) {
@@ -95,7 +106,7 @@ uint16_t dec2bin(uint8_t n) {
     return bin;
 }
 
-void display_number(uint8_t chip,uint8_t display, int64_t number) {
+void display_number(uint8_t chip, uint8_t display, int64_t number) {
     if((display < 0) || (display > 1))
         return; // invalid display number
     else {

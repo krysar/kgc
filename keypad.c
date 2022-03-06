@@ -5,9 +5,8 @@
 #include "keypad.h"
 #include "max7219.h"
 
-uint8_t keypad_status = 0, section = 0, command = 0, change_register;
+uint8_t keypad_status = 0, verb = 0, noun = 0, change_register;
 uint8_t section_choice[] = {254, 254}, command_choice[] = {254, 254};
-uint8_t program[4] = {}, prev_program[4] = {};
 bool debounce = false;
 
 // Init function for keypad
@@ -25,8 +24,8 @@ void keypad_init() {
 
 // Function is called by alarm to display sec. and comm. numb. after 800 ms blank
 int64_t display_program(alarm_id_t id, void *user_data) {
-    display_two_digit_number(0, 0, 0, section);
-    display_two_digit_number(0, 0, 1, command);
+    display_two_digit_number(0, 0, 0, verb);
+    display_two_digit_number(0, 0, 1, noun);
     keypad_status = 0;
     return 0;
 }
@@ -37,21 +36,21 @@ int64_t debounce_unset(alarm_id_t id, void *user_data) {
 }
 
 uint8_t key_evaluate(uint8_t pressed_key) {
-    // KEY_SECTION is pressed without any previous section operation
-    // Preparation for insert 1st section digit
+    // KEY_SECTION is pressed without any previous verb operation
+    // Preparation for insert 1st verb digit
     if ((pressed_key == KEY_SECTION) && (section_choice[0] == 254) && (section_choice[1] == 254)) {
         spi_send_data(0, REG_DIGIT0, code_table[24]);
         spi_send_data(0, REG_DIGIT1, code_table[24]);
         section_choice[0] = 255;
         return 0;
-        // KEY_COMMAND is pressed without any previous command operation
-        // Preparation for insert 1st command digit
+        // KEY_COMMAND is pressed without any previous noun operation
+        // Preparation for insert 1st noun digit
     } else if ((pressed_key == KEY_COMMAND) && (command_choice[0] == 254) && (section_choice[1] == 254)) {
         spi_send_data(0, REG_DIGIT2, code_table[24]);
         spi_send_data(0, REG_DIGIT3, code_table[24]);
         command_choice[0] = 255;
         return 0;
-        // Inserting 1st section digit, preparation for insert 2nd
+        // Inserting 1st verb digit, preparation for insert 2nd
     } else if (section_choice[0] == 255) {
         if (pressed_key >= 10) // We're accepting 0 - 10 keys only
             return 0;
@@ -59,7 +58,7 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         section_choice[1] = 255;
         spi_send_data(0, REG_DIGIT0, code_table[pressed_key]);
         return 0;
-        // Inserting 1st command digit, preparation for insert 2nd
+        // Inserting 1st noun digit, preparation for insert 2nd
     } else if(command_choice[0] == 255) {
         if(pressed_key >= 10)
             return 0;
@@ -67,43 +66,39 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         command_choice[1] = 255;
         spi_send_data(0, REG_DIGIT2, code_table[pressed_key]);
         return 0;
-        // Inserting 2nd section digit
+        // Inserting 2nd verb digit
     } else if(section_choice[1] == 255) {
         if(pressed_key >= 10)
             return 0;
         section_choice[1] = pressed_key;
         spi_send_data(0, REG_DIGIT1, code_table[pressed_key]);
         return 0;
-        // Inserting 2nd command digit
+        // Inserting 2nd noun digit
     } else if (command_choice[1] == 255) {
         if (pressed_key >= 10)
             return 0;
         command_choice[1] = pressed_key;
         spi_send_data(0, REG_DIGIT3, code_table[pressed_key]);
         return 0;
-        // KEY_ENTER is pressed, section only is inserted
-        // It's necessary to insert also command - preparation for insert 1st command digit
+        // KEY_ENTER is pressed, verb only is inserted
+        // It's necessary to insert also noun - preparation for insert 1st noun digit
     } else if ((pressed_key == KEY_ENTER) && (section_choice[1] < 254) && (command_choice[1] >= 254)) {
         spi_send_data(0, REG_DIGIT2, code_table[24]);
         spi_send_data(0, REG_DIGIT3, code_table[24]);
         command_choice[0] = 255;
         return 0;
-        // KEY_ENTER is pressed, at least command is inserted
-        // Test if section is inserted -> change program variable -> display new program -> return 1 (program change)
+        // KEY_ENTER is pressed, at least noun is inserted
+        // Test if verb is inserted -> change program variable -> display new program -> return 1 (program change)
     } else if ((pressed_key == KEY_ENTER) && (command_choice[1] < 254)) {
         if (section_choice[1] < 254) {
-            section = 0;
-            section += section_choice[0] * 10;
-            section += section_choice[1];
+            verb = 0;
+            verb += section_choice[0] * 10;
+            verb += section_choice[1];
         }
 
-        command = 0;
-        command += command_choice[0] * 10;
-        command += command_choice[1];
-
-        if (section < 10) {
-            program[1] = section;
-        }
+        noun = 0;
+        noun += command_choice[0] * 10;
+        noun += command_choice[1];
 
         section_choice[0] = 254;
         section_choice[1] = 254;
@@ -118,6 +113,7 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
 
         return 1; // program change
+        //insert todo?
     } else if(keypad_status == 2) {
 
     }

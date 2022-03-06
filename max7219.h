@@ -37,7 +37,7 @@ void cs_select(uint8_t chip);
 void cs_deselect(uint8_t chip);
 void spi_send_data(uint8_t chip, uint8_t address, uint8_t data);
 void max7219_init();
-void clear_display(uint8_t chip);
+void clear_display(uint8_t chip, uint8_t display);
 uint16_t dec2bin(uint8_t n);
 void display_number(uint8_t chip,uint8_t display, int64_t number);
 void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8_t number);
