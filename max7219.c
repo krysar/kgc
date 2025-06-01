@@ -168,7 +168,7 @@ void display_number(uint8_t chip, uint8_t display, int64_t number) {
             spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[0]);
         } else { // Display positive number
             if (number < -999999999999999999) { // we're not able to display number <= 10*10^17
-                spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[25]);
+                spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
                 spi_send_data(chip, REG_DIGIT1 + (display * 4), CODE_BLANK);
                 spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[17]);
                 spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[19]);
@@ -193,19 +193,19 @@ void display_number(uint8_t chip, uint8_t display, int64_t number) {
                 // Display number depending on  number of digits
                 switch (num_digits) {
                     case 1:
-                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[25]);
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
                         spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[0]);
                         spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[0]);
                         spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits[0]]);
                         break;
                     case 2:
-                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[25]);
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
                         spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[0]);
                         spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits[0]]);
                         spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits[1]]);
                         break;
                     default:
-                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[25] + decimal_points[0] * CODE_DP);
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26] + decimal_points[0] * CODE_DP);
                         spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits[0]] + decimal_points[1] * CODE_DP);
                         spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits[1]] + decimal_points[2] * CODE_DP);
                         spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits[2]] + decimal_points[3] * CODE_DP);

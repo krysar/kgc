@@ -28,7 +28,8 @@
 #pragma ide diagnostic ignored "EndlessLoop"
 
 int64_t reg1 = 0, reg2 = 0, reg3 = 0; // displays registers
-uint8_t hrs, min, sec, milisec100;
+uint8_t hrs, min, sec;
+int8_t milisec100;
 
 void led_init();
 void core1_entry();
@@ -41,6 +42,20 @@ int main() {
     max7219_init();
     spi_send_data(0, REG_SHUTDOWN, 0x01);
     spi_send_data(1, REG_SHUTDOWN, 0x01);
+
+    //Welcome message
+    spi_send_data(0, REG_DIGIT0, code_table[17]); // K
+    spi_send_data(0, REG_DIGIT1, code_table[6]);  // G
+    spi_send_data(0, REG_DIGIT2, code_table[12]); // c
+    spi_send_data(0, REG_DIGIT4, code_table[24]); // v
+    spi_send_data(0, REG_DIGIT5, code_table[14]); // E
+    spi_send_data(0, REG_DIGIT6, code_table[22]); // r
+    spi_send_data(1, REG_DIGIT0, code_table[0]);  // 0
+    spi_send_data(1, REG_DIGIT2, code_table[0]);  // 0
+    spi_send_data(1, REG_DIGIT3, code_table[2]);  // 2
+
+    sleep_ms(2000);
+
     display_number(0, 0, 0);
 
 
@@ -52,66 +67,26 @@ int main() {
     struct repeating_timer timer;
     add_repeating_timer_ms(100, timer_handler, NULL, &timer);
 
-    multicore_launch_core1(core1_entry);
-
     while(true) {
-        switch(verb) {
-            case 0:
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
+        printf("Verb: %u Noun: %u\n", verb, noun);
+        sleep_ms(1000);
 
-                while (keypad_status == 0) {
+        switch (verb)
+        {
+        case 00:
+            clear_display(0, 1);
+            clear_display(1, 0);
+            clear_display(1, 1);
+            break;
+        
+        case 01:
+            display_number(0, 1, 1234);
+            display_number(1, 0, 5678);
+            display_number(1, 1, 1479);
+            break;
 
-                }
-
-                break;
-
-            case 1:
-                while (keypad_status == 0) {
-
-                }
-
-                break;
-
-            case 99: //device test
-                reg1 = 0;
-                reg2 = 0;
-                reg3 = 0;
-
-                for(register uint8_t i = 2; i <= 14; i++ ) {
-                    if((i == 5) || (i == 13))
-                        continue;
-                    else {
-                        gpio_put(i, true);
-                    }
-                }
-
-                uint16_t i = 0;
-                while (keypad_status == 0) {
-                    display_number(0, 1, i);
-                    display_number(1, 0, i);
-                    display_number(1, 1, i);
-
-                    i = (i == 9999) ? 0 : i + 1111;
-
-                    sleep_ms(1000);
-                }
-
-                for(register uint8_t i = 2; i <= 14; i++ ) {
-                    if((i == 5) || (i == 13))
-                        continue;
-                    else {
-                        gpio_put(i, false);
-                    }
-                }
-
-                break;
-
-            default:
-                while (keypad_status == 0) {
-
-                }
+        default:
+            break;
         }
     }
 }
@@ -127,78 +102,7 @@ void led_init() {
     }
 }
 
-void core1_entry() {
-    multicore_fifo_clear_irq();
-
-    while(true) {
-        if((verb == 0) || (verb == 99))
-            continue;
-        else {
-            switch (noun) {
-                case 0: //no-op
-                    reg1 = 0;
-                    reg2 = 0;
-                    reg3 = 0;
-                    while (keypad_status == 0) {
-
-                    }
-                    break;
-                case 1: // stopwatch
-                    reg1 = 0, reg2 = 0, reg3 = 0;
-                    milisec100 = 0, sec = 0, min = 0, hrs = 0;
-                    while (keypad_status == 0) {
-                        if (milisec100 >= 10) { // 100 ms = 1 sec
-                            sec++;
-                            milisec100 = 0;
-                            if (sec == 60) {
-                                min++;
-                                sec = 0;
-                                if (min == 60) {
-                                    hrs++;
-                                    min = 0;
-                                }
-                            }
-                        }
-                        reg1 = sec;
-                        reg2 = min;
-                        reg3 = hrs;
-                    }
-                    break;
-                case 2: //odpocet
-                    reg1 = 0, reg2 = 0, reg3 = 0;
-                    milisec100 = 10, sec = 60;
-                    while (keypad_status == 0) {
-                        if (milisec100 == 0) {
-                            sec--;
-                            if (sec == 0)
-                                sec = 60;
-                        }
-                        reg2 = sec;
-                    }
-                    break;
-                default:
-                    reg1 = 4321;
-                    reg2 = 1234;
-                    reg3 = 9876;
-            }
-        }
-    }
-}
-
 bool timer_handler(struct repeating_timer *t) {
-    if (noun == 1)
-        milisec100++;
-    else if (noun == 2)
-        milisec100--;
-
-    if(verb == 0)
-        return true;
-    else if(verb == 99)
-        return true;
-
-    display_number(0, 1, reg1);
-    display_number(1, 0, reg2);
-    display_number(1, 1, reg3);
     return true;
 }
 

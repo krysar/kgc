@@ -6,7 +6,7 @@
 #define PIN_CS1 17 // LOAD (CS)
 #define PIN_CS2 5 // LOAD (CS)
 #define SPI_PORT spi0
-#define SPI_BAUDRATE 10000
+#define SPI_BAUDRATE 9600
 
 #define REG_NOOP        0x00
 #define REG_DIGIT0      0x01
@@ -29,9 +29,9 @@ static uint8_t code_table[] = {0x7E, 0x30, 0x6D, 0x79,     // 0, 1, 2, 3
                         0x33, 0x5B, 0x5F, 0x70,            // 4, 5, 6, 7
                         0x7F, 0x7B, 0x77, 0x1F,            // 8, 9, A, b
                         0x4E, 0x3D, 0x4F, 0x47,            // C, d, E, F
-                        0x17, 0x0E, 0x15, 0x1D,            // h, L, n, o
-                        0x67, 0x05, 0x07, 0x1C,            // P, r, t, u
-                        0x08, 0x01};                       // _, -
+                        0x17, 0x57, 0x0E, 0x15,            // h, K, L, n
+                        0x1D, 0x67, 0x05, 0x07,            // o, P, r, t
+                        0x1C, 0x08, 0x01};                 // u, _, -
 
 void cs_select(uint8_t chip);
 void cs_deselect(uint8_t chip);
