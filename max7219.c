@@ -62,6 +62,7 @@ void max7219_init() {
 
     // Init both MAX72xx
     for (register uint8_t i = 0; i < 2; i++) {
+        sleep_ms(100);
         spi_send_data(i, REG_DISPLAYTEST, 0x00);
         // Set max intensity
         spi_send_data(i, REG_INTENSITY, 0x0F);
@@ -235,4 +236,18 @@ void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8
         spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[digits[0]]);
         spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[digits[1]]);
     }
+}
+
+void welcome_message_print() {
+    spi_send_data(0, REG_DIGIT0, code_table[17]); // K
+    spi_send_data(0, REG_DIGIT1, code_table[6]);  // G
+    spi_send_data(0, REG_DIGIT2, code_table[12]); // c
+    spi_send_data(0, REG_DIGIT4, code_table[24]); // v
+    spi_send_data(0, REG_DIGIT5, code_table[14]); // E
+    spi_send_data(0, REG_DIGIT6, code_table[22]); // r
+    spi_send_data(1, REG_DIGIT0, code_table[0]);  // 0
+    spi_send_data(1, REG_DIGIT2, code_table[0]);  // 0
+    spi_send_data(1, REG_DIGIT3, code_table[2]);  // 2
+
+    sleep_ms(2000);
 }

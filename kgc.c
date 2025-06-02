@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
 
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
@@ -11,6 +13,7 @@
 
 #include "max7219.h"
 #include "keypad.h"
+#include "connection.h"
 
 #define LED_CON 2
 #define LED_FLD 3
@@ -27,52 +30,35 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
-int64_t reg1 = 0, reg2 = 0, reg3 = 0; // displays registers
-uint8_t hrs, min, sec;
-int8_t milisec100;
-
 void led_init();
-void core1_entry();
-bool timer_handler(struct repeating_timer *t);
+bool timer_1s_handler(__unused struct repeating_timer *t);
 
 int main() {
     stdio_init_all();
+    // Peripherals init
     keypad_init();
     led_init();
     max7219_init();
     spi_send_data(0, REG_SHUTDOWN, 0x01);
     spi_send_data(1, REG_SHUTDOWN, 0x01);
+    // Connection with main computer init
+    conn_init();
+    // Timer init
+    struct repeating_timer timer_1s;
+    add_repeating_timer_ms(1000, timer_1s_handler, NULL, &timer_1s);
 
-    //Welcome message
-    spi_send_data(0, REG_DIGIT0, code_table[17]); // K
-    spi_send_data(0, REG_DIGIT1, code_table[6]);  // G
-    spi_send_data(0, REG_DIGIT2, code_table[12]); // c
-    spi_send_data(0, REG_DIGIT4, code_table[24]); // v
-    spi_send_data(0, REG_DIGIT5, code_table[14]); // E
-    spi_send_data(0, REG_DIGIT6, code_table[22]); // r
-    spi_send_data(1, REG_DIGIT0, code_table[0]);  // 0
-    spi_send_data(1, REG_DIGIT2, code_table[0]);  // 0
-    spi_send_data(1, REG_DIGIT3, code_table[2]);  // 2
-
-    sleep_ms(2000);
+    // Welcome message
+    welcome_message_print();
 
     display_number(0, 0, 0);
-
 
     gpio_set_irq_enabled_with_callback(col[0], GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &keypad_irq_handler);
     for(register uint8_t i = 1; i < 4; i++) {
         gpio_set_irq_enabled(col[i], GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
     }
-
-    struct repeating_timer timer;
-    add_repeating_timer_ms(100, timer_handler, NULL, &timer);
-
+    
     while(true) {
-        printf("Verb: %u Noun: %u\n", verb, noun);
-        sleep_ms(1000);
-
-        switch (verb)
-        {
+        switch (verb) {
         case 00:
             clear_display(0, 1);
             clear_display(1, 0);
@@ -80,10 +66,54 @@ int main() {
             break;
         
         case 01:
+            switch (noun) {
+            case 01:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int alt = 0, apo = 0, per = 0; // TODO: int64_t
+                        sscanf(uart_str_in, " %d;%d;%d", &alt, &apo, &per);
+                        //printf("str: %s\n", uart_str_in);
+                        //printf("Altitude: %d\nApoapsis: %d\nPeriapsis: %d\n\n", alt, apo, per);
+                        //memset(uart_str_in, 0, UART_STR_IN_BUF_SIZE);
+                        display_number(0, 1, alt);
+                        display_number(1, 0, apo);
+                        display_number(1, 1, per);
+                    }
+                }
+                break;
+            
+            default:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                break;
+            }
+            break;
+        
+        case 02:
+            clear_display(0, 1);
+            clear_display(1, 0);
+            clear_display(1, 1);
+            long uart_in_num = 0;
+
+            while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                // printf("Str: %s", uart_str_in);
+                if(strlen(uart_str_in) > 0) {
+                    char *tmp;
+                    uart_in_num = strtol(uart_str_in, &tmp, NUM_BASE_DEC);
+                    //memset(uart_str_in, 0, UART_STR_IN_BUF_SIZE);
+                }
+                display_number(0, 1, uart_in_num);
+            }
+            break;
+        
+        case 99:
             display_number(0, 1, 1234);
             display_number(1, 0, 5678);
-            display_number(1, 1, 1479);
-            break;
+            display_number(1, 1, 9012);
 
         default:
             break;
@@ -102,7 +132,12 @@ void led_init() {
     }
 }
 
-bool timer_handler(struct repeating_timer *t) {
+bool timer_1s_handler(__unused struct repeating_timer *t) {
+    char buffer[50];
+    printf("Verb: %u Noun: %u\n", verb, noun);
+    sprintf(buffer, "V:%u;N:%u\n", verb, noun);
+    uart_puts(UART_ID, buffer);
+
     return true;
 }
 
