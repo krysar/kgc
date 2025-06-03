@@ -1,3 +1,7 @@
+/*
+ * Library for user inputs from keypad and program control
+*/
+
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"

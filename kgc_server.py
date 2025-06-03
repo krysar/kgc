@@ -1,6 +1,8 @@
 import krpc
 import serial
 
+print("KGC 0.2")
+
 serial_port = input("Serial port? ")
 ser_conn = serial.Serial(serial_port, 115200)
 ser_conn.bytesize = serial.EIGHTBITS
@@ -16,12 +18,22 @@ tst = 1024
 verb = 0
 noun = 0
 
-while True:
+# Waiting for handshake
+print("Connecting to kgc...", end=" ")
+handshake_in = ser_conn.readline()
+handshake_in = handshake_in.decode("utf-8", "strict")
+if handshake_in == "WAITING\n":
+    handshake_out = "ACCEPTED\n"
+    handshake_out = handshake_out.encode("utf-8", "strict")
+    ser_conn.write(handshake_out)
+    print("[ok]")
+
+while handshake_in == "WAITING\n":
     ser_in = ser_conn.readline()
     ser_str = ser_in.decode("utf-8", "strict")
     ser_in_str = ser_str.strip()
     ser_in_list = ser_str.split(';')
-    print(ser_str)
+    # print(ser_str)
 
     for i in ser_in_list:
         if i.startswith("V:"):
@@ -32,7 +44,7 @@ while True:
             noun = i.split(':')
             noun = noun[1].strip()
             noun = int(noun)
-        print("Verb is ", verb, ", noun is ", noun)
+        # print("Verb is ", verb, ", noun is ", noun)
 
     if str(krpc_conn.krpc.current_game_scene) == "GameScene.flight": # type: ignore
         vessel = krpc_conn.space_center.active_vessel # type: ignore
@@ -46,8 +58,10 @@ while True:
                         ser_out = ser_out_str.encode("utf-8")
                         ser_conn.write(ser_out)
             # Testing output
-            case 2:
-                ser_out_str = str(tst) + "\n"
-                ser_out = ser_out_str.encode("utf-8")
-                ser_conn.write(ser_out)
-                tst += 1
+            case 99:
+                match noun:
+                    case 2:
+                        ser_out_str = str(tst) + "\n"
+                        ser_out = ser_out_str.encode("utf-8")
+                        ser_conn.write(ser_out)
+                        tst += 1
