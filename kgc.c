@@ -19,7 +19,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
-bool timer_1s_handler(__unused struct repeating_timer *t);
+bool timer_uart_send_handler(__unused struct repeating_timer *t);
 
 int main() {
     stdio_init_all();
@@ -42,9 +42,9 @@ int main() {
     verb = 0, noun = 0;
     display_number(0, 0, 0);
 
-    // Timer init
-    struct repeating_timer timer_1s;
-    add_repeating_timer_ms(1000, timer_1s_handler, NULL, &timer_1s);
+    // Timer for periodical sending data via UART init
+    struct repeating_timer timer_uart_send;
+    add_repeating_timer_ms(UART_SEND_PERIOD_MS, timer_uart_send_handler, NULL, &timer_uart_send);
 
     gpio_set_irq_enabled_with_callback(col[0], GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &keypad_irq_handler);
     for(register uint8_t i = 1; i < 4; i++) {
@@ -55,6 +55,7 @@ int main() {
     
     while(true) {
         KSP_DATA flight_data = uart_data_decoder(uart_str_in);
+        led_update(flight_data);
 
         switch (verb) {
         case 0:
@@ -65,7 +66,7 @@ int main() {
                 clear_display(1, 0);
                 clear_display(1, 1);
 
-                cancel_repeating_timer(&timer_1s);
+                cancel_repeating_timer(&timer_uart_send);
                 gpio_put(LED_CON, false);
                 memset(uart_str_in, 0, UART_STR_IN_BUF_SIZE);
                 goto handshake;
@@ -87,11 +88,13 @@ int main() {
                 clear_display(1, 1);
                 while (keypad_status != KEY_STAT_PRG_CHANGE) {
                     flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
                     display_number(0, 1, flight_data.num1);
                     display_number(1, 0, flight_data.num2);
                     display_number(1, 1, flight_data.num3);
                 }
             } else {
+                led_update(flight_data);
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -115,6 +118,7 @@ int main() {
                 clear_display(1, 1);
                 while (keypad_status != KEY_STAT_PRG_CHANGE) {
                     flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
                     display_number(0, 1, flight_data.num1);
                     display_number(1, 0, flight_data.num2);
                     display_number(1, 1, flight_data.num3);
@@ -130,7 +134,7 @@ int main() {
     }
 }
 
-bool timer_1s_handler(__unused struct repeating_timer *t) {
+bool timer_uart_send_handler(__unused struct repeating_timer *t) {
     char buffer[50];
     printf("Verb: %u Noun: %u\n", verb, noun);
     sprintf(buffer, "V:%u;N:%u\n", verb, noun);

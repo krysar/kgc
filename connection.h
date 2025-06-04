@@ -11,6 +11,7 @@
 #define UART_STR_IN_BUF_SIZE 256
 #define UART_HANDSHAKE_MESSAGE "WAITING\n"
 #define UART_HANDSHAKE_ANSWER "ACCEPTED\n"
+#define UART_SEND_PERIOD_MS 250
 
 #define NUM_BASE_DEC 10
 #define NUM_BASE_HEX 16
@@ -30,6 +31,7 @@ typedef struct ksp_data {
     int8_t rcs;
     int8_t gea;
     int8_t brk;
+    int8_t pau;
 } KSP_DATA;
 
 void conn_init();

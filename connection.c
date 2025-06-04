@@ -55,7 +55,6 @@ void uart_irq_handler() {
         uart_str_in[strlen(uart_str_in)] = '\0';
     }
     
-    printf("str: %s\n", uart_str_in);
     printf("strlen: %d\n", strlen(uart_str_in));
     printf("\n");
 }
@@ -96,15 +95,15 @@ bool uart_handshake_timer_handler(__unused struct repeating_timer *t) {
 }
 
 KSP_DATA uart_data_decoder(char *uart_str) {
-    KSP_DATA ksp_out = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    KSP_DATA ksp_out = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // String format:
     // (VDI = Verb/Noun Depend Information)
-    // "VDI1;VDI2;VDI3;FLD;ELC;MOP;LFO;OTR;SAS;RCS;GEA;BRK
+    // "VDI1;VDI2;VDI3;FLD;ELC;MOP;LFO;OTR;SAS;RCS;GEA;BRK;PAU
 
     // String decode:
-    sscanf(uart_str, " %lld;%lld;%lld;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi",
-    &ksp_out.num1, &ksp_out.num2, &ksp_out.num3, &ksp_out.fld, &ksp_out.elc, &ksp_out.mop, &ksp_out.lfo, &ksp_out.otr, &ksp_out.sas, &ksp_out.rcs, &ksp_out.gea, &ksp_out.brk);
+    sscanf(uart_str, " %lld;%lld;%lld;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi",
+    &ksp_out.num1, &ksp_out.num2, &ksp_out.num3, &ksp_out.fld, &ksp_out.elc, &ksp_out.mop, &ksp_out.lfo, &ksp_out.otr, &ksp_out.sas, &ksp_out.rcs, &ksp_out.gea, &ksp_out.brk, &ksp_out.pau);
 
     return ksp_out;
 }

@@ -29,31 +29,73 @@ def dsky_send(num1: int, num2: int, num3: int):
     match str(krpc_conn.krpc.current_game_scene): # type: ignore
         case "GameScene.space_center":
             fld = 0
+            sas = 0
+            rcs = 0
+            gea = 0
+            brk = 0
         case "GameScene.flight":
             fld = 1
+
+            if krpc_conn.space_center.active_vessel.control.sas: # type: ignore
+                sas = 1
+            else:
+                sas = 0
+
+            if krpc_conn.space_center.active_vessel.control.rcs: # type: ignore
+                rcs = 1
+            else:
+                rcs = 0
+
+            if krpc_conn.space_center.active_vessel.control.gear: # type: ignore
+                gea = 1
+            else:
+                gea = 0
+
+            if krpc_conn.space_center.active_vessel.control.brakes: # type: ignore
+                brk = 1
+            else:
+                brk = 0
+
         case "GameScene.tracking_station":
             fld = 2
+            sas = 0
+            rcs = 0
+            gea = 0
+            brk = 0
         case "GameScene.editor_vab":
             fld = 3
+            sas = 0
+            rcs = 0
+            gea = 0
+            brk = 0
         case "GameScene.editor_sph":
             fld = 4
+            sas = 0
+            rcs = 0
+            gea = 0
+            brk = 0
         case _:
             fld = -1
+            sas = 0
+            rcs = 0
+            gea = 0
+            brk = 0
 
-    # TODO: support for ELC, MOP, LFO, OTR, SAS, RCS, GEA and BRK
+    if krpc_conn.krpc.paused: # type: ignore
+        pau = 1
+    else:
+        pau = 0
+
+    # TODO: support for ELC, MOP, LFO and OTR
     elc = 0
     mop = 0
     lfo = 0
     otr = 0
-    sas = 0
-    rcs = 0
-    gea = 0
-    brk = 0
 
     ser_out = str(num1) + ";" + str(num2) + ";" + str(num3) + ";"
     ser_out += str(fld) + ";" + str(elc) + ";" + str(mop) + ";"
     ser_out += str(lfo) + ";" + str(otr) + ";" + str(sas) + ";"
-    ser_out += str(rcs) + ";" + str(gea) + ";" + str(brk)
+    ser_out += str(rcs) + ";" + str(gea) + ";" + str(brk) + ";" + str(pau)
 
     ser_out = ser_out.encode("utf-8", "strict")
     ser_conn.write(ser_out)
