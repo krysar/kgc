@@ -56,7 +56,7 @@ TODO
 | 01   | 09   | Time to sphere of influence change [sec]  |                        | Crashes when no SOI change |
 |      |      | Time to sphere of influence change [min]  |                        |                            |
 |      |      | Time to sphere of influence change [hrs]  |                        |                            |
-| 1    | 10   | Time to sphere of influence change [min]  |                        | Crashes when no SOI change |
+| 01   | 10   | Time to sphere of influence change [min]  |                        | Crashes when no SOI change |
 |      |      | Time to sphere of influence change [hrs]  |                        |                            |
 |      |      | Time to sphere of influence change [days] |                        | Kerbin days                |
 | 01   | 11   | Heading [°]                               |                        | TODO: check ref. frame     |
