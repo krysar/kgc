@@ -76,12 +76,12 @@ bool uart_handshake() {
 
     // Waiting for answer
     while(strlen(uart_str_in) == 0) {
-        printf("Stucked :/\n");
+        // printf("Stucked :/\n");
+        sleep_us(100);
     }
 
     if(strcmp(uart_str_in, UART_HANDSHAKE_ANSWER) == 0) {
         cancel_repeating_timer(&handshake_timer);
-        gpio_put(LED_CON, true);
         return 0;
     } else {
         cancel_repeating_timer(&handshake_timer);
@@ -89,7 +89,22 @@ bool uart_handshake() {
     }
 }
 
+
 bool uart_handshake_timer_handler(__unused struct repeating_timer *t) {
     char handshake_message[] = UART_HANDSHAKE_MESSAGE;
     uart_puts(UART_ID, handshake_message);
+}
+
+KSP_DATA uart_data_decoder(char *uart_str) {
+    KSP_DATA ksp_out = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    // String format:
+    // (VDI = Verb/Noun Depend Information)
+    // "VDI1;VDI2;VDI3;FLD;ELC;MOP;LFO;OTR;SAS;RCS;GEA;BRK
+
+    // String decode:
+    sscanf(uart_str, " %lld;%lld;%lld;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi;%hhi",
+    &ksp_out.num1, &ksp_out.num2, &ksp_out.num3, &ksp_out.fld, &ksp_out.elc, &ksp_out.mop, &ksp_out.lfo, &ksp_out.otr, &ksp_out.sas, &ksp_out.rcs, &ksp_out.gea, &ksp_out.brk);
+
+    return ksp_out;
 }

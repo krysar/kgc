@@ -53,7 +53,7 @@ int64_t debounce_unset(alarm_id_t id, void *user_data) {
 }
 
 uint8_t key_evaluate(uint8_t pressed_key) {
-    if(keypad_status == 2) {
+    if(keypad_status == KEY_STAT_NUM_INSERT) {
         if(pressed_key == KEY_ENTER) {
             insert[0] = revert_number(insert[0]);
             spi_send_data(0, REG_DIGIT4, CODE_BLANK);

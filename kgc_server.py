@@ -1,4 +1,6 @@
 import krpc
+import krpc.attributes
+import krpc.types
 import serial
 import math
 
@@ -21,6 +23,40 @@ def sec_to_ddhhmm(time_in_sec: int) -> tuple[int, int, int]:
     time = (day, hr, min)
 
     return time
+
+def dsky_send(num1: int, num2: int, num3: int):
+    # FLD define:
+    match str(krpc_conn.krpc.current_game_scene): # type: ignore
+        case "GameScene.space_center":
+            fld = 0
+        case "GameScene.flight":
+            fld = 1
+        case "GameScene.tracking_station":
+            fld = 2
+        case "GameScene.editor_vab":
+            fld = 3
+        case "GameScene.editor_sph":
+            fld = 4
+        case _:
+            fld = -1
+
+    # TODO: support for ELC, MOP, LFO, OTR, SAS, RCS, GEA and BRK
+    elc = 0
+    mop = 0
+    lfo = 0
+    otr = 0
+    sas = 0
+    rcs = 0
+    gea = 0
+    brk = 0
+
+    ser_out = str(num1) + ";" + str(num2) + ";" + str(num3) + ";"
+    ser_out += str(fld) + ";" + str(elc) + ";" + str(mop) + ";"
+    ser_out += str(lfo) + ";" + str(otr) + ";" + str(sas) + ";"
+    ser_out += str(rcs) + ";" + str(gea) + ";" + str(brk)
+
+    ser_out = ser_out.encode("utf-8", "strict")
+    ser_conn.write(ser_out)
 
 # Main program:
 
@@ -80,99 +116,79 @@ while handshake_in == "WAITING\n":
                 match noun:
                     # Noun 1 = Altitude above sea level + Apoapsis + Periapsis
                     case 1:
-                        ser_out_str = str(int(vessel.flight().mean_altitude)) + ";" + str(int(vessel.orbit.apoapsis_altitude)) + ";" + str(int(vessel.orbit.periapsis_altitude))
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(int(vessel.flight().mean_altitude), int(vessel.orbit.apoapsis_altitude), int(vessel.orbit.periapsis_altitude))
 
                     # Noun 2 = Inclination + eccentricity + mean anomaly
                     case 2:
                         inc = int(vessel.orbit.inclination * 180 / math.pi) # Convert radians to degrees
-                        ser_out_str = str(inc) + ";" + str(int(vessel.orbit.eccentricity)) + ";" + str(int(vessel.orbit.mean_anomaly))
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(inc, int(vessel.orbit.eccentricity), int(vessel.orbit.mean_anomaly))
 
                     # Noun 3 = Time to apoapsis [ss:mm:hhhh]
                     case 3:
                         tta = int(vessel.orbit.time_to_apoapsis)
                         tta = sec_to_hhmmss(tta)
-                        ser_out_str = str(tta[2]) + ";" + str(tta[1]) + ";" + str(tta[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(tta[2], tta[1], tta[0])
                     
                     # Noun 4 = Time to apoapsis [mm:hh:dddd]
                     case 4:
                         tta = int(vessel.orbit.time_to_apoapsis)
                         tta = sec_to_ddhhmm(tta)
-                        ser_out_str = str(tta[2]) + ";" + str(tta[1]) + ";" + str(tta[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(tta[2], tta[1], tta[0])
 
                     # Noun 5 = Time to periapsis [ss:mm:hhhh]
                     case 5:
                         ttp = int(vessel.orbit.time_to_periapsis)
                         ttp = sec_to_hhmmss(ttp)
-                        ser_out_str = str(ttp[2]) + ";" + str(ttp[1]) + ";" + str(ttp[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(ttp[2], ttp[1], ttp[0])
 
                     # Noun 6 = Time to periapsis [mm:hh:dddd]
                     case 6:
                         ttp = int(vessel.orbit.time_to_periapsis)
                         ttp = sec_to_ddhhmm(ttp)
-                        ser_out_str = str(ttp[2]) + ";" + str(ttp[1]) + ";" + str(ttp[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(ttp[2], ttp[1], ttp[0])
 
                     # Noun 7 = Orbit period [ss:mm:hhhh]
                     case 7:
                         orp = int(vessel.orbit.period)
                         orp = sec_to_hhmmss(orp)
-                        ser_out_str = str(orp[2]) + ";" + str(orp[1]) + ";" + str(orp[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(orp[2], orp[1], orp[0])
 
                     # Noun 8 = Orbit period [mm:hh:dddd]
                     case 8:
                         orp = int(vessel.orbit.period)
                         orp = sec_to_ddhhmm(orp)
-                        ser_out_str = str(orp[2]) + ";" + str(orp[1]) + ";" + str(orp[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(orp[2], orp[1], orp[0])
 
                     # Noun 9 = Time to sphere of influence change [ss:mm:hhhh]
                     case 9:
                         soic = int(vessel.orbit.time_to_soi_change)
                         soic = sec_to_hhmmss(soic)
-                        ser_out_str = str(soic[2]) + ";" + str(soic[1]) + ";" + str(soic[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(soic[2], soic[1], soic[0])
 
                     # Noun 10 = Time to sphere of influence change [mm:hh:dddd]
                     case 10:
                         soic = int(vessel.orbit.time_to_soi_change)
                         soic = sec_to_ddhhmm(soic)
-                        ser_out_str = str(soic[2]) + ";" + str(soic[1]) + ";" + str(soic[0])
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(soic[2], soic[1], soic[0])
 
                     # Noun 11 = Heading + pitch + roll
                     case 11:
-                        ser_out_str = str(int(vessel.flight(vsl_frame).heading)) + ";" + str(int(vessel.flight(vsl_frame).pitch)) + ";" + str(int(vessel.flight(vsl_frame).roll))
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(int(vessel.flight(vsl_frame).heading), int(vessel.flight(vsl_frame).pitch), int(vessel.flight(vsl_frame).roll))
 
                     # Noun 12 = Velocity
                     case 12:
-                        ser_out_str = str(int(vessel.velocity(srf_frame)[0])) + ";" + str(int(vessel.velocity(srf_frame)[1])) + ";" + str(int(vessel.velocity(srf_frame)[2]))
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(int(vessel.velocity(srf_frame)[0]), int(vessel.velocity(srf_frame)[1]), int(vessel.velocity(srf_frame)[2]))
+
+                    case _:
+                        dsky_send(0, 0, 0)
                         
 
             # Testing output
             case 99:
                 match noun:
                     case 2:
-                        ser_out_str = str(tst) + "\n"
-                        ser_out = ser_out_str.encode("utf-8")
-                        ser_conn.write(ser_out)
+                        dsky_send(tst, 0, 0)
                         tst += 1
+
+            case _:
+                dsky_send(0, 0, 0)

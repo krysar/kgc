@@ -17,9 +17,25 @@
 
 extern char uart_str_in[UART_STR_IN_BUF_SIZE];
 
+typedef struct ksp_data {
+    int64_t num1;
+    int64_t num2;
+    int64_t num3;
+    int8_t fld;
+    int8_t elc;
+    int8_t mop;
+    int8_t lfo;
+    int8_t otr;
+    int8_t sas;
+    int8_t rcs;
+    int8_t gea;
+    int8_t brk;
+} KSP_DATA;
+
 void conn_init();
 void uart_irq_handler();
 bool uart_handshake();
 bool uart_handshake_timer_handler(__unused struct repeating_timer *t);
+KSP_DATA uart_data_decoder(char *uart_str);
 
 #endif //KGC_CONNECTION_H
