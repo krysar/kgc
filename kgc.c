@@ -10,6 +10,7 @@
 #include "hardware/gpio.h"
 #include "pico/multicore.h"
 #include "hardware/irq.h"
+#include "hardware/watchdog.h"
 
 #include "max7219.h"
 #include "keypad.h"
@@ -20,6 +21,7 @@
 #pragma ide diagnostic ignored "EndlessLoop"
 
 bool timer_uart_send_handler(__unused struct repeating_timer *t);
+void software_reset();
 
 int main() {
     stdio_init_all();
@@ -72,6 +74,13 @@ int main() {
                 goto handshake;
 
                 break;
+            // Restart DSKY
+            case 2:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                sleep_ms(500);
+                software_reset();
             
             default:
                 clear_display(0, 1);
@@ -82,7 +91,7 @@ int main() {
             break;
         
         case 1:
-            if((noun > 0) && (noun <= 12)) {
+            if((noun > 0) && (noun <= 13)) {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -99,6 +108,27 @@ int main() {
                 clear_display(1, 0);
                 clear_display(1, 1);
             }
+            break;
+
+        case 2:
+            if((noun > 0) && (noun <= 3)) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_number(1, 1, flight_data.num3);
+                }
+            } else {
+                led_update(flight_data);
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+            }
+
             break;
         
         // Testing verb
@@ -141,6 +171,11 @@ bool timer_uart_send_handler(__unused struct repeating_timer *t) {
     uart_puts(UART_ID, buffer);
 
     return true;
+}
+
+void software_reset() {
+    watchdog_enable(1, 1);
+    while(1);
 }
 
 #pragma clang diagnostic pop

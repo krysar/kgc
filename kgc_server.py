@@ -163,7 +163,9 @@ while handshake_in == "WAITING\n":
                     # Noun 2 = Inclination + eccentricity + mean anomaly
                     case 2:
                         inc = int(vessel.orbit.inclination * 180 / math.pi) # Convert radians to degrees
-                        dsky_send(inc, int(vessel.orbit.eccentricity), int(vessel.orbit.mean_anomaly))
+                        ano = int(vessel.orbit.mean_anomaly * 180 / math.pi)
+                        ecc = int(vessel.orbit.eccentricity * 10000)
+                        dsky_send(inc, ecc, ano)
 
                     # Noun 3 = Time to apoapsis [ss:mm:hhhh]
                     case 3:
@@ -221,9 +223,32 @@ while handshake_in == "WAITING\n":
                     case 12:
                         dsky_send(int(vessel.velocity(srf_frame)[0]), int(vessel.velocity(srf_frame)[1]), int(vessel.velocity(srf_frame)[2]))
 
+                    # Noun 13 = Orbital speed + surface speed
+                    case 13:
+                        dsky_send(int(vessel.orbit.speed), int(vessel.flight(srf_frame).speed), 0)
+
                     case _:
                         dsky_send(0, 0, 0)
-                        
+
+            # Verb 2 = Display vessel info
+            case 2:
+                  match noun:
+                    # Noun 1 = Mission Elapsed Time [ss:mm:hhhh]    
+                    case 1:
+                          met = int(vessel.met)
+                          met = sec_to_hhmmss(met)
+                          dsky_send(met[2], met[1], met[0])
+
+                    # Noun 2 = Mission Elapsed Time [mm:hh:dddd]
+                    case 2:
+                          met = int(vessel.met)
+                          met = sec_to_ddhhmm(met)
+                          dsky_send(met[2], met[1], met[0])
+
+                    # Noun 3 = Mass + available thurst + specific impulse
+                    case 3:
+                          dsky_send(int(vessel.mass), int(vessel.available_thrust), int(vessel.specific_impulse))
+
 
             # Testing output
             case 99:
