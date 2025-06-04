@@ -283,3 +283,4 @@ gerbers/
 
 # End of https://www.toptal.com/developers/gitignore/api/c,python,visualstudiocode
 
+tester.py

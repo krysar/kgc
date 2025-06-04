@@ -53,10 +53,10 @@ int main() {
     
     while(true) {
         switch (verb) {
-        case 00:
+        case 0:
             switch (noun) {
             // Disconnect from server
-            case 01:
+            case 1:
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -76,19 +76,196 @@ int main() {
             }
             break;
         
-        case 01:
+        case 1:
             switch (noun) {
-            case 01:
+            // Altitude above sea level + apoapsis + periapsis
+            case 1:
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
                 while (keypad_status != KEY_STAT_PRG_CHANGE) {
                     if(strlen(uart_str_in) > 0) {
-                        int alt = 0, apo = 0, per = 0; // TODO: int64_t
-                        sscanf(uart_str_in, " %d;%d;%d", &alt, &apo, &per);
+                        int64_t alt = 0, apo = 0, per = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &alt, &apo, &per);
                         display_number(0, 1, alt);
                         display_number(1, 0, apo);
                         display_number(1, 1, per);
+                    }
+                }
+                break;
+            
+            // Inclination + eccentricity + mean anomaly
+            case 2:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t inc = 0, ecc = 0, ano = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &inc, &ecc, &ano);
+                        display_number(0, 1, inc);
+                        display_number(1, 0, ecc);
+                        display_number(1, 1, ano);
+                    }
+                }
+                break;
+
+            // Time to apoapsis [ss:mm:hhhh]
+            case 3:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t sec = 0, min = 0, hour = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &sec, &min, &hour);
+                        display_number(0, 1, sec);
+                        display_number(1, 0, min);
+                        display_number(1, 1, hour);
+                    }
+                }
+                break;
+            
+            // Time to apoapsis [mm:hh:dddd]
+            case 4:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t min = 0, hour = 0, day = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &min, &hour, &day);
+                        display_number(0, 1, min);
+                        display_number(1, 0, hour);
+                        display_number(1, 1, day);
+                    }
+                }
+                break;
+
+            // Time to periapsis [ss:mm:hhhh]
+            case 5:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t sec = 0, min = 0, hour = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &sec, &min, &hour);
+                        display_number(0, 1, sec);
+                        display_number(1, 0, min);
+                        display_number(1, 1, hour);
+                    }
+                }
+                break;
+
+            // Time to periapsis [mm:hh:dddd]
+            case 6:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t min = 0, hour = 0, day = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &min, &hour, &day);
+                        display_number(0, 1, min);
+                        display_number(1, 0, hour);
+                        display_number(1, 1, day);
+                    }
+                }
+                break;
+
+            // Period [ss:mm:hhhh]
+            case 7:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t sec = 0, min = 0, hour = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &sec, &min, &hour);
+                        display_number(0, 1, sec);
+                        display_number(1, 0, min);
+                        display_number(1, 1, hour);
+                    }
+                }
+                break;
+
+            // Period [mm:hh:dddd]
+            case 8:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t min = 0, hour = 0, day = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &min, &hour, &day);
+                        display_number(0, 1, min);
+                        display_number(1, 0, hour);
+                        display_number(1, 1, day);
+                    }
+                }
+                break;
+
+            // Time to sphere of influence change [ss:mm:hhhh]
+            case 9:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t sec = 0, min = 0, hour = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &sec, &min, &hour);
+                        display_number(0, 1, sec);
+                        display_number(1, 0, min);
+                        display_number(1, 1, hour);
+                    }
+                }
+                break;
+
+            // Time to sphere of influence change [mm:hh:dddd]
+            case 10:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t min = 0, hour = 0, day = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &min, &hour, &day);
+                        display_number(0, 1, min);
+                        display_number(1, 0, hour);
+                        display_number(1, 1, day);
+                    }
+                }
+                break;
+
+            // Pitch + heading + roll
+            case 11:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t pit = 0, hea = 0, rol = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &hea, &pit, &rol);
+                        display_number(0, 1, hea);
+                        display_number(1, 0, pit);
+                        display_number(1, 1, rol);
+                    }
+                }
+                break;
+
+            // Velocity [x, y, z]
+            case 12:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    if(strlen(uart_str_in) > 0) {
+                        int64_t vx = 0, vy = 0, vz = 0;
+                        sscanf(uart_str_in, " %lld;%lld;%lld", &vx, &vy, &vz);
+                        display_number(0, 1, vx);
+                        display_number(1, 0, vy);
+                        display_number(1, 1, vz);
                     }
                 }
                 break;
@@ -105,14 +282,14 @@ int main() {
         case 99:
         switch (noun) {
             // Display 3 static numbers
-            case 01:
+            case 1:
                 display_number(0, 1, 1234);
                 display_number(1, 0, 5678);
                 display_number(1, 1, 9012);
                 break;
             
             // Display incrementing number from server
-            case 02:
+            case 2:
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
