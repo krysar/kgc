@@ -77,3 +77,21 @@ TODO
 | 02   | 03   | Mass [kg]                                 |                        |                            |
 |      |      | Available thurst [N]                      |                        |                            |
 |      |      | Specific impulse [sec]                    |                        |                            |
+| 02   | 04   | Electric charge capacity [-]              |                        |                            |
+|      |      | Monopropellant capacity [-]               |                        |                            |
+|      |      | Liquid fuel capacity [-]                  |                        |                            |
+| 02   | 05   | Electric charge amount [-]                |                        | TODO: float                |
+|      |      | Monopropellant amount [-]                 |                        | TODO: float                |
+|      |      | Liquid fuel amount [-]                    |                        | TODO: float                |
+| 02   | 06   | Electric charge amount [%]                |                        | TODO: float                |
+|      |      | Monopropellant amount [%]                 |                        | TODO: float                |
+|      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
+| 02   | 07   | Electric charge capacity [-]              |                        |                            |
+|      |      | Electric charge amount [-]                |                        | TODO: float                |
+|      |      | Electric charge amount [%]                |                        | TODO: float                |
+| 02   | 08   | Monopropellant capacity [-]               |                        |                            |
+|      |      | Monopropellant amount [-]                 |                        | TODO: float                |
+|      |      | Monopropellant amount [%]                 |                        | TODO: float                |
+| 02   | 09   | Liquid fuel capacity [-]                  |                        |                            |
+|      |      | Liquid fuel amount [-]                    |                        | TODO: float                |
+|      |      | Liquid fuel amount [%]                    |                        | TODO: float                |

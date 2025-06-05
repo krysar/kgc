@@ -25,6 +25,17 @@ void led_init() {
 }
 
 void led_update(KSP_DATA ksp_in) {
+    // CON LED:
+    if(time_since_last_connection == 5) {
+        led_stat[LED_STAT_CON] = true;
+    } else if(time_since_last_connection == 6) {
+        led_stat[LED_STAT_CON] = false;
+        gpio_put(LED_CON, false);
+    } else {
+        led_stat[LED_STAT_CON] = false;
+        gpio_put(LED_CON, true);
+    }
+
     // FLD LED:
     if(ksp_in.fld == 1) {
         if(ksp_in.pau == 1) {
@@ -34,7 +45,38 @@ void led_update(KSP_DATA ksp_in) {
             gpio_put(LED_FLD, true);
         }
     } else {
+        led_stat[LED_STAT_FLD] = false;
         gpio_put(LED_FLD, false);
+    }
+
+    if(ksp_in.elc == 1) {
+        led_stat[LED_STAT_ELC] = true;
+    } else if(ksp_in.elc == 2) {
+        led_stat[LED_STAT_ELC] = false;
+        gpio_put(LED_ELC, true);
+    } else {
+        led_stat[LED_STAT_ELC] = false;
+        gpio_put(LED_ELC, false);
+    }
+
+    if(ksp_in.mop == 1) {
+        led_stat[LED_STAT_MOP] = true;
+    } else if(ksp_in.mop == 2) {
+        led_stat[LED_STAT_MOP] = false;
+        gpio_put(LED_MOP, true);
+    } else {
+        led_stat[LED_STAT_MOP] = false;
+        gpio_put(LED_MOP, false);
+    }
+
+    if(ksp_in.lfo == 1) {
+        led_stat[LED_STAT_LFO] = true;
+    } else if(ksp_in.lfo == 2) {
+        led_stat[LED_STAT_LFO] = false;
+        gpio_put(LED_STAT_LFO, true);
+    } else {
+        led_stat[LED_STAT_LFO] = false;
+        gpio_put(LED_STAT_LFO, false);
     }
 
     // SAS LED:
@@ -75,6 +117,8 @@ bool led_blinker(__unused struct repeating_timer *t) {
         (blink_stat) ? gpio_put(BUZZ, false) : gpio_put(BUZZ, true);
 
     blink_stat = !blink_stat;
+    if(time_since_last_connection < 5)
+        time_since_last_connection++;
 
     return true;
 }

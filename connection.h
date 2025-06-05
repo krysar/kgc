@@ -11,12 +11,20 @@
 #define UART_STR_IN_BUF_SIZE 256
 #define UART_HANDSHAKE_MESSAGE "WAITING\n"
 #define UART_HANDSHAKE_ANSWER "ACCEPTED\n"
+#define UART_EMPTY_STRING "0;0;0;0;0;0;0;0;0;0;0;0"
 #define UART_SEND_PERIOD_MS 250
 
 #define NUM_BASE_DEC 10
 #define NUM_BASE_HEX 16
 
+// Global string for storing data from UART.
 extern char uart_str_in[UART_STR_IN_BUF_SIZE];
+
+// Time since last data received in sec.
+// Handled by led_update() and led_blinker() in led.c (I know it's not ideal...)
+// CON LED starts blinking when connection is probably lost.
+// Reseted every time when uart_irq_handler() is triggered.
+extern uint8_t time_since_last_connection;
 
 typedef struct ksp_data {
     int64_t num1;

@@ -13,6 +13,7 @@
 #include "led.h"
 
 char uart_str_in[UART_STR_IN_BUF_SIZE] = "";
+uint8_t time_since_last_connection = 0;
 
 void conn_init() {
     uart_init(UART_ID, UART_BAUD_RATE);
@@ -39,6 +40,7 @@ void conn_init() {
 
 void uart_irq_handler() {
     char uart_str_in_buf[UART_STR_IN_BUF_SIZE] = "";
+    time_since_last_connection = 0;
     // memset(uart_str_in, 0, UART_STR_IN_BUF_SIZE);
     printf("Incomming message: ");
     while (uart_is_readable_within_us(UART_ID, 850)) {
@@ -83,6 +85,8 @@ bool uart_handshake() {
         cancel_repeating_timer(&handshake_timer);
         return 0;
     } else {
+        // Now it de facto accepts ANY message from UART...
+        // TODO: repair
         cancel_repeating_timer(&handshake_timer);
         return 1;
     }

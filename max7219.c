@@ -246,8 +246,8 @@ void welcome_message_print() {
     spi_send_data(0, REG_DIGIT5, code_table[14]); // E
     spi_send_data(0, REG_DIGIT6, code_table[22]); // r
     spi_send_data(1, REG_DIGIT0, code_table[0]);  // 0
-    spi_send_data(1, REG_DIGIT2, code_table[0]);  // 0
-    spi_send_data(1, REG_DIGIT3, code_table[2]);  // 2
+    spi_send_data(1, REG_DIGIT2, CODE_BLANK);     // 
+    spi_send_data(1, REG_DIGIT3, code_table[3]);  // 3
 
     sleep_ms(2000);
 }

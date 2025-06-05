@@ -69,7 +69,10 @@ int main() {
                 clear_display(1, 1);
 
                 cancel_repeating_timer(&timer_uart_send);
-                gpio_put(LED_CON, false);
+                time_since_last_connection = 6;
+                flight_data = uart_data_decoder(UART_EMPTY_STRING);
+                led_update(flight_data);
+
                 memset(uart_str_in, 0, UART_STR_IN_BUF_SIZE);
                 goto handshake;
 
@@ -81,7 +84,8 @@ int main() {
                 clear_display(1, 1);
                 sleep_ms(500);
                 software_reset();
-            
+                break;
+                
             default:
                 clear_display(0, 1);
                 clear_display(1, 0);
@@ -111,7 +115,7 @@ int main() {
             break;
 
         case 2:
-            if((noun > 0) && (noun <= 3)) {
+            if((noun > 0) && (noun <= 9)) {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);

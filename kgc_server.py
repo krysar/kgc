@@ -29,53 +29,109 @@ def dsky_send(num1: int, num2: int, num3: int):
     match str(krpc_conn.krpc.current_game_scene): # type: ignore
         case "GameScene.space_center":
             fld = 0
+            elc = 0
+            mop = 0
+            lfo = 0
             sas = 0
             rcs = 0
             gea = 0
             brk = 0
         case "GameScene.flight":
+            vessel = krpc_conn.space_center.active_vessel # type: ignore
+
+            # Remaining electric charge
+            if vessel.resources.has_resource("ElectricCharge"):
+                el_charge = vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge")
+            else:
+                el_charge = -1
+
+            # Remaining monopropellant
+            if vessel.resources.has_resource("MonoPropellant"):
+                monoprop = vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant")
+            else:
+                monoprop = -1
+
+            # Remaining fuel
+            if vessel.resources.has_resource("LiquidFuel"):
+                liq_fuel = vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel")
+            else:
+                liq_fuel = -1
+
             fld = 1
 
-            if krpc_conn.space_center.active_vessel.control.sas: # type: ignore
+            if el_charge > 0 and el_charge <= 0.1:
+                elc = 1
+            elif el_charge == 0:
+                elc = 2
+            else:
+                elc = 0
+
+            if monoprop > 0 and monoprop <= 0.1:
+                mop = 1
+            elif monoprop == 0:
+                mop = 2
+            else:
+                mop = 0
+
+            if liq_fuel > 0 and liq_fuel <= 0.1:
+                lfo = 1
+            elif liq_fuel == 0:
+                lfo = 2
+            else:
+                lfo = 0
+
+            if vessel.control.sas:
                 sas = 1
             else:
                 sas = 0
 
-            if krpc_conn.space_center.active_vessel.control.rcs: # type: ignore
+            if vessel.control.rcs:
                 rcs = 1
             else:
                 rcs = 0
 
-            if krpc_conn.space_center.active_vessel.control.gear: # type: ignore
+            if vessel.control.gear: 
                 gea = 1
             else:
                 gea = 0
 
-            if krpc_conn.space_center.active_vessel.control.brakes: # type: ignore
+            if vessel.control.brakes: 
                 brk = 1
             else:
                 brk = 0
 
         case "GameScene.tracking_station":
             fld = 2
+            elc = 0
+            mop = 0
+            lfo = 0
             sas = 0
             rcs = 0
             gea = 0
             brk = 0
         case "GameScene.editor_vab":
             fld = 3
+            elc = 0
+            mop = 0
+            lfo = 0
             sas = 0
             rcs = 0
             gea = 0
             brk = 0
         case "GameScene.editor_sph":
             fld = 4
+            elc = 0
+            mop = 0
+            lfo = 0
             sas = 0
             rcs = 0
             gea = 0
             brk = 0
         case _:
             fld = -1
+            elc = 0
+            mop = 0
+            lfo = 0
             sas = 0
             rcs = 0
             gea = 0
@@ -86,10 +142,7 @@ def dsky_send(num1: int, num2: int, num3: int):
     else:
         pau = 0
 
-    # TODO: support for ELC, MOP, LFO and OTR
-    elc = 0
-    mop = 0
-    lfo = 0
+    # TODO: support OTR
     otr = 0
 
     ser_out = str(num1) + ";" + str(num2) + ";" + str(num3) + ";"
@@ -100,9 +153,14 @@ def dsky_send(num1: int, num2: int, num3: int):
     ser_out = ser_out.encode("utf-8", "strict")
     ser_conn.write(ser_out)
 
+def dsky_send_empty_string():
+    ser_out = "0;0;0;0;0;0;0;0;0;0;0;0"
+    ser_out = ser_out.encode("utf-8", "strict")
+    ser_conn.write(ser_out)
+
 # Main program:
 
-print("KGC 0.2")
+print("KGC 0.3")
 
 serial_port = input("Serial port? ")
 ser_conn = serial.Serial(serial_port, 115200)
@@ -249,6 +307,104 @@ while handshake_in == "WAITING\n":
                     case 3:
                           dsky_send(int(vessel.mass), int(vessel.available_thrust), int(vessel.specific_impulse))
 
+                    # Noun 4 = ELC capacity + MOP capacity + LFO capacity
+                    case 4:
+                        if vessel.resources.has_resource("ElectricCharge"):
+                            el_charge = int(vessel.resources.max("ElectricCharge"))
+                        else:
+                            el_charge = 0
+                        
+                        if vessel.resources.has_resource("MonoPropellant"):
+                            monoprop = int(vessel.resources.max("MonoPropellant"))
+                        else:
+                            monoprop = 0
+                        
+                        if vessel.resources.has_resource("LiquidFuel"):
+                            liq_fuel = int(vessel.resources.max("LiquidFuel"))
+                        else:
+                            liq_fuel = 0
+
+                        dsky_send(el_charge, monoprop, liq_fuel)
+
+                    # Noun 5 = ELC amount + MOP amount + LFO amount
+                    case 5:
+                        if vessel.resources.has_resource("ElectricCharge"):
+                            el_charge = int(vessel.resources.amount("ElectricCharge"))
+                        else:
+                            el_charge = 0
+                        
+                        if vessel.resources.has_resource("MonoPropellant"):
+                            monoprop = int(vessel.resources.amount("MonoPropellant"))
+                        else:
+                            monoprop = 0
+                        
+                        if vessel.resources.has_resource("LiquidFuel"):
+                            liq_fuel = int(vessel.resources.amount("LiquidFuel"))
+                        else:
+                            liq_fuel = 0
+
+                        dsky_send(el_charge, monoprop, liq_fuel)
+
+                    # Noun 6 = ELC amount [%] + MOP amount [%] + LFO amount [%]
+                    case 6:
+                        if vessel.resources.has_resource("ElectricCharge"):
+                            el_charge = int(vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge") * 100)
+                        else:
+                            el_charge = 0
+                        
+                        if vessel.resources.has_resource("MonoPropellant"):
+                            monoprop = int(vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant") * 100)
+                        else:
+                            monoprop = 0
+                        
+                        if vessel.resources.has_resource("LiquidFuel"):
+                            liq_fuel = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100)
+                        else:
+                            liq_fuel = 0
+
+                        dsky_send(el_charge, monoprop, liq_fuel)
+
+                    # Noun 7 = ELC capacity + ELC amount + ELC amount [%]
+                    case 7:
+                        if vessel.resources.has_resource("ElectricCharge"):
+                            el_max = int(vessel.resources.max("ElectricCharge"))
+                            el_amo = int(vessel.resources.amount("ElectricCharge"))
+                            el_prc = int(vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge") * 100)
+                        else:
+                            el_max = 0
+                            el_amo = 0
+                            el_prc = 0
+
+                        dsky_send(el_max, el_amo, el_prc)
+
+                    # Noun 8 = MOP capacity + MOP amount + MOP amount [%]
+                    case 8:
+                        if vessel.resources.has_resource("MonoPropellant"):
+                            mop_max = int(vessel.resources.max("MonoPropellant"))
+                            mop_amo = int(vessel.resources.amount("MonoPropellant"))
+                            mop_prc = int(vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant") * 100)
+                        else:
+                            mop_max = 0
+                            mop_amo = 0
+                            mop_prc = 0
+
+                        dsky_send(mop_max, mop_amo, mop_prc)
+
+                    # Noun 9 = LFO capacity + LFO amount + LFO amount [%]
+                    case 9:
+                        if vessel.resources.has_resource("LiquidFuel"):
+                            lfo_max = int(vessel.resources.max("LiquidFuel"))
+                            lfo_amo = int(vessel.resources.amount("LiquidFuel"))
+                            lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100)
+                        else:
+                            lfo_max = 0
+                            lfo_amo = 0
+                            lfo_prc = 0
+
+                        dsky_send(lfo_max, lfo_amo, lfo_prc)
+
+
+
 
             # Testing output
             case 99:
@@ -259,3 +415,5 @@ while handshake_in == "WAITING\n":
 
             case _:
                 dsky_send(0, 0, 0)
+    else:
+        dsky_send_empty_string()
