@@ -132,9 +132,48 @@ int main() {
                 clear_display(1, 0);
                 clear_display(1, 1);
             }
+            break;
 
+        case 3:
+            if((noun > 0) && (noun <= 3)) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_number(1, 1, flight_data.num3);
+                }
+            } else {
+                led_update(flight_data);
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+            }
             break;
         
+        case 5:
+            if((noun > 0) && (noun <= 2)) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_number(1, 1, flight_data.num3);
+                }
+            } else {
+                led_update(flight_data);
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+            }
+            break;
+
         // Testing verb
         case 99:
         switch (noun) {

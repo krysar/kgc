@@ -403,8 +403,36 @@ while handshake_in == "WAITING\n":
 
                         dsky_send(lfo_max, lfo_amo, lfo_prc)
 
+            # Verb 3 = Take off
+            case 3:
+                match noun:
+                    # Noun 1 = Surface speed + vertical speed + surface altitude
+                    case 1:
+                        dsky_send(int(vessel.flight(srf_frame).speed), int(vessel.flight(srf_frame).vertical_speed), int(vessel.flight().surface_altitude))
+
+                    # Noun 2 = Mean altitude + apoapsis + inclination
+                    case 2:
+                        dsky_send(int(vessel.flight().mean_altitude), int(vessel.orbit.apoapsis), int(vessel.orbit.inclination))
+
+                    # Noun 3 = Apoapsis + periapsis + inclination
+                    case 3:
+                        dsky_send(int(vessel.orbit.apoapsis), int(vessel.orbit.periapsis), int(vessel.orbit.inclination))
 
 
+            # Verb 5 = Landing
+            case 5:
+                match noun:
+                    # Noun 1 = Surface altitude + surface speed + LFO amount [%]
+                    case 1:
+                        if vessel.resources.has_resource("LiquidFuel"):
+                            lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100)
+                            dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed), lfo_prc)
+                        else:
+                            dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed), 0)
+
+                    # Noun 2 = Surface altitude + vertical speed + horizontal speed
+                    case 2:
+                        dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).vertical_speed), int(vessel.flight(srf_frame).horizontal_speed))
 
             # Testing output
             case 99:

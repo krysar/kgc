@@ -95,3 +95,18 @@ TODO
 | 02   | 09   | Liquid fuel capacity [-]                  |                        |                            |
 |      |      | Liquid fuel amount [-]                    |                        | TODO: float                |
 |      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
+| 03   | 01   | Surface speed [m/s]                       |                        |                            |
+|      |      | Vertical speed [m/s]                      |                        |                            |
+|      |      | Altitude above surface [m]                |                        |                            |
+| 03   | 02   | Altitude above sea level                  |                        |                            |
+|      |      | Apoapsis [m]                              |                        |                            |
+|      |      | Orbital inclination [°]                   |                        |                            |
+| 03   | 03   | Apoapsis [m]                              |                        |                            |
+|      |      | Periapsis [m]                             |                        |                            |
+|      |      | Orbital inclination [°]                   |                        |                            |
+| 05   | 01   | Altitude above surface [m]                |                        |                            |
+|      |      | Surface speed [m/s]                       |                        |                            |
+|      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
+| 05   | 02   | Altitude above surface [m]                |                        |                            |
+|      |      | Vertical speed [m/s]                      |                        |                            |
+|      |      | Horizontal speed [m/s]                    |                        |                            |
