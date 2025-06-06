@@ -160,7 +160,7 @@ def dsky_send_empty_string():
 
 # Main program:
 
-print("KGC 0.3")
+print("KGC 0.3.1")
 
 serial_port = input("Serial port? ")
 ser_conn = serial.Serial(serial_port, 115200)
@@ -169,7 +169,7 @@ ser_conn.stopbits = serial.STOPBITS_ONE
 ser_conn.parity = serial.PARITY_EVEN
 ser_conn.timeout = None
 
-krpc_conn = krpc.connect(name='KGC 0.02')
+krpc_conn = krpc.connect(name='KGC 0.3.1')
 if ser_conn.is_open == False:
     ser_conn.open()
 
@@ -468,13 +468,13 @@ while handshake_in == "WAITING\n":
                     case 1:
                         if vessel.resources.has_resource("LiquidFuel"):
                             lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100 * 1000)
-                            dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed), lfo_prc)
+                            dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed * 1000), lfo_prc)
                         else:
-                            dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed), 0)
+                            dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed * 1000), 0)
 
                     # Noun 2 = Surface altitude + vertical speed + horizontal speed
                     case 2:
-                        dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).vertical_speed), int(vessel.flight(srf_frame).horizontal_speed))
+                        dsky_send(int(vessel.flight().surface_altitude), int(-vessel.flight(srf_frame).vertical_speed * 1000), int(vessel.flight(srf_frame).horizontal_speed * 1000))
 
                     case _:
                         dsky_send_empty_string()

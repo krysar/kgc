@@ -32,9 +32,9 @@ TODO
 | 01   | 01   | Altitude above sea level [m]              |                        |                            |
 |      |      | Apoapsis [m]                              |                        |                            |
 |      |      | Periapsis [m]                             |                        |                            |
-| 01   | 02   | Orbital inclination [°]                   |                        | TODO: float                |
-|      |      | Orbital eccentricity [°]                  |                        | TODO: float                |
-|      |      | Mean anomaly [°]                          |                        | TODO: float                |
+| 01   | 02   | Orbital inclination [°]                   |                        |                            |
+|      |      | Orbital eccentricity [°]                  |                        |                            |
+|      |      | Mean anomaly [°]                          |                        |                            |          
 | 01   | 03   | Time to apoapsis [hrs]                    |                        |                            |
 |      |      | Time to apoapsis [min]                    |                        |                            |
 |      |      | Time to apoapsis [sec]                    |                        |                            |
@@ -83,18 +83,18 @@ TODO
 | 02   | 05   | Electric charge amount [-]                |                        | TODO: float                |
 |      |      | Monopropellant amount [-]                 |                        | TODO: float                |
 |      |      | Liquid fuel amount [-]                    |                        | TODO: float                |
-| 02   | 06   | Electric charge amount [%]                |                        | TODO: float                |
-|      |      | Monopropellant amount [%]                 |                        | TODO: float                |
-|      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
+| 02   | 06   | Electric charge amount [%]                |                        |                            |
+|      |      | Monopropellant amount [%]                 |                        |                            |
+|      |      | Liquid fuel amount [%]                    |                        |                            |
 | 02   | 07   | Electric charge capacity [-]              |                        |                            |
 |      |      | Electric charge amount [-]                |                        | TODO: float                |
-|      |      | Electric charge amount [%]                |                        | TODO: float                |
+|      |      | Electric charge amount [%]                |                        |                            |
 | 02   | 08   | Monopropellant capacity [-]               |                        |                            |
 |      |      | Monopropellant amount [-]                 |                        | TODO: float                |
-|      |      | Monopropellant amount [%]                 |                        | TODO: float                |
+|      |      | Monopropellant amount [%]                 |                        |                            |
 | 02   | 09   | Liquid fuel capacity [-]                  |                        |                            |
 |      |      | Liquid fuel amount [-]                    |                        | TODO: float                |
-|      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
+|      |      | Liquid fuel amount [%]                    |                        |                            |
 | 03   | 01   | Surface speed [m/s]                       |                        |                            |
 |      |      | Vertical speed [m/s]                      |                        |                            |
 |      |      | Altitude above surface [m]                |                        |                            |
