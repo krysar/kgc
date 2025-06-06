@@ -6,7 +6,7 @@
 #define PIN_CS1 17 // LOAD (CS)
 #define PIN_CS2 5 // LOAD (CS)
 #define SPI_PORT spi0
-#define SPI_BAUDRATE 9600
+#define SPI_BAUDRATE 50
 
 #define REG_NOOP        0x00
 #define REG_DIGIT0      0x01
@@ -25,13 +25,14 @@
 
 #define CODE_BLANK      0x00
 #define CODE_DP         0x80
-static uint8_t code_table[] = {0x7E, 0x30, 0x6D, 0x79,     // 0, 1, 2, 3
-                        0x33, 0x5B, 0x5F, 0x70,            // 4, 5, 6, 7
-                        0x7F, 0x7B, 0x77, 0x1F,            // 8, 9, A, b
-                        0x4E, 0x3D, 0x4F, 0x47,            // C, d, E, F
-                        0x17, 0x57, 0x0E, 0x15,            // h, K, L, n
-                        0x1D, 0x67, 0x05, 0x07,            // o, P, r, t
-                        0x1C, 0x08, 0x01};                 // u, _, -
+
+static uint8_t code_table[] = {0x7E, 0x30, 0x6D, 0x79,     // 0,  1,  2,  3
+                        0x33, 0x5B, 0x5F, 0x70,            // 4,  5,  6,  7
+                        0x7F, 0x7B, 0x77, 0x1F,            // 8,  9,  A,  b
+                        0x4E, 0x3D, 0x4F, 0x47,            // C,  d,  E,  F
+                        0x17, 0x57, 0x0E, 0x15,            // h,  K,  L,  n
+                        0x1D, 0x67, 0x05, 0x07,            // o,  P,  r,  t
+                        0x1C, 0x08, 0x01};                 // u,  _,  -
 
 void cs_select(uint8_t chip);
 void cs_deselect(uint8_t chip);
@@ -41,6 +42,7 @@ void clear_display(uint8_t chip, uint8_t display);
 uint16_t dec2bin(uint8_t n);
 void display_number(uint8_t chip,uint8_t display, int64_t number);
 void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8_t number);
+void display_float_number(uint8_t chip, uint8_t display, float number);
 void welcome_message_print();
 
 #endif //KGC_MAX7219_H

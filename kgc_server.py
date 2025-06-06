@@ -220,58 +220,64 @@ while handshake_in == "WAITING\n":
 
                     # Noun 2 = Inclination + eccentricity + mean anomaly
                     case 2:
-                        inc = int(vessel.orbit.inclination * 180 / math.pi) # Convert radians to degrees
-                        ano = int(vessel.orbit.mean_anomaly * 180 / math.pi)
-                        ecc = int(vessel.orbit.eccentricity * 10000)
+                        inc = int((vessel.orbit.inclination * 180 / math.pi) * 1000) # Convert radians to degrees
+                        ano = int((vessel.orbit.mean_anomaly * 180 / math.pi) * 1000)
+                        ecc = int(vessel.orbit.eccentricity * 1000)
                         dsky_send(inc, ecc, ano)
 
                     # Noun 3 = Time to apoapsis [ss:mm:hhhh]
                     case 3:
                         tta = int(vessel.orbit.time_to_apoapsis)
                         tta = sec_to_hhmmss(tta)
-                        dsky_send(tta[2], tta[1], tta[0])
+                        dsky_send(tta[0], tta[1], tta[2])
                     
                     # Noun 4 = Time to apoapsis [mm:hh:dddd]
                     case 4:
                         tta = int(vessel.orbit.time_to_apoapsis)
                         tta = sec_to_ddhhmm(tta)
-                        dsky_send(tta[2], tta[1], tta[0])
+                        dsky_send(tta[0], tta[1], tta[2])
 
                     # Noun 5 = Time to periapsis [ss:mm:hhhh]
                     case 5:
                         ttp = int(vessel.orbit.time_to_periapsis)
                         ttp = sec_to_hhmmss(ttp)
-                        dsky_send(ttp[2], ttp[1], ttp[0])
+                        dsky_send(ttp[0], ttp[1], ttp[2])
 
                     # Noun 6 = Time to periapsis [mm:hh:dddd]
                     case 6:
                         ttp = int(vessel.orbit.time_to_periapsis)
                         ttp = sec_to_ddhhmm(ttp)
-                        dsky_send(ttp[2], ttp[1], ttp[0])
+                        dsky_send(ttp[0], ttp[1], ttp[2])
 
                     # Noun 7 = Orbit period [ss:mm:hhhh]
                     case 7:
                         orp = int(vessel.orbit.period)
                         orp = sec_to_hhmmss(orp)
-                        dsky_send(orp[2], orp[1], orp[0])
+                        dsky_send(orp[0], orp[1], orp[2])
 
                     # Noun 8 = Orbit period [mm:hh:dddd]
                     case 8:
                         orp = int(vessel.orbit.period)
                         orp = sec_to_ddhhmm(orp)
-                        dsky_send(orp[2], orp[1], orp[0])
+                        dsky_send(orp[0], orp[1], orp[2])
 
                     # Noun 9 = Time to sphere of influence change [ss:mm:hhhh]
                     case 9:
-                        soic = int(vessel.orbit.time_to_soi_change)
-                        soic = sec_to_hhmmss(soic)
-                        dsky_send(soic[2], soic[1], soic[0])
+                        if math.isnan(vessel.orbit.time_to_soi_change):
+                            dsky_send_empty_string()
+                        else:
+                            soic = int(vessel.orbit.time_to_soi_change)
+                            soic = sec_to_hhmmss(soic)
+                            dsky_send(soic[0], soic[1], soic[2])
 
                     # Noun 10 = Time to sphere of influence change [mm:hh:dddd]
                     case 10:
-                        soic = int(vessel.orbit.time_to_soi_change)
-                        soic = sec_to_ddhhmm(soic)
-                        dsky_send(soic[2], soic[1], soic[0])
+                        if math.isnan(vessel.orbit.time_to_soi_change):
+                            dsky_send_empty_string()
+                        else:
+                            soic = int(vessel.orbit.time_to_soi_change)
+                            soic = sec_to_ddhhmm(soic)
+                            dsky_send(soic[0], soic[1], soic[2])
 
                     # Noun 11 = Heading + pitch + roll
                     case 11:
@@ -286,7 +292,7 @@ while handshake_in == "WAITING\n":
                         dsky_send(int(vessel.orbit.speed), int(vessel.flight(srf_frame).speed), 0)
 
                     case _:
-                        dsky_send(0, 0, 0)
+                        dsky_send_empty_string()
 
             # Verb 2 = Display vessel info
             case 2:
@@ -295,13 +301,13 @@ while handshake_in == "WAITING\n":
                     case 1:
                           met = int(vessel.met)
                           met = sec_to_hhmmss(met)
-                          dsky_send(met[2], met[1], met[0])
+                          dsky_send(met[0], met[1], met[2])
 
                     # Noun 2 = Mission Elapsed Time [mm:hh:dddd]
                     case 2:
                           met = int(vessel.met)
                           met = sec_to_ddhhmm(met)
-                          dsky_send(met[2], met[1], met[0])
+                          dsky_send(met[0], met[1], met[2])
 
                     # Noun 3 = Mass + available thurst + specific impulse
                     case 3:
@@ -348,17 +354,17 @@ while handshake_in == "WAITING\n":
                     # Noun 6 = ELC amount [%] + MOP amount [%] + LFO amount [%]
                     case 6:
                         if vessel.resources.has_resource("ElectricCharge"):
-                            el_charge = int(vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge") * 100)
+                            el_charge = int(vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge") * 100 * 1000)
                         else:
                             el_charge = 0
                         
                         if vessel.resources.has_resource("MonoPropellant"):
-                            monoprop = int(vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant") * 100)
+                            monoprop = int(vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant") * 100 * 1000)
                         else:
                             monoprop = 0
                         
                         if vessel.resources.has_resource("LiquidFuel"):
-                            liq_fuel = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100)
+                            liq_fuel = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100 * 1000)
                         else:
                             liq_fuel = 0
 
@@ -369,7 +375,7 @@ while handshake_in == "WAITING\n":
                         if vessel.resources.has_resource("ElectricCharge"):
                             el_max = int(vessel.resources.max("ElectricCharge"))
                             el_amo = int(vessel.resources.amount("ElectricCharge"))
-                            el_prc = int(vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge") * 100)
+                            el_prc = int(vessel.resources.amount("ElectricCharge") / vessel.resources.max("ElectricCharge") * 100 * 1000)
                         else:
                             el_max = 0
                             el_amo = 0
@@ -382,7 +388,7 @@ while handshake_in == "WAITING\n":
                         if vessel.resources.has_resource("MonoPropellant"):
                             mop_max = int(vessel.resources.max("MonoPropellant"))
                             mop_amo = int(vessel.resources.amount("MonoPropellant"))
-                            mop_prc = int(vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant") * 100)
+                            mop_prc = int(vessel.resources.amount("MonoPropellant") / vessel.resources.max("MonoPropellant") * 100 * 1000)
                         else:
                             mop_max = 0
                             mop_amo = 0
@@ -395,13 +401,16 @@ while handshake_in == "WAITING\n":
                         if vessel.resources.has_resource("LiquidFuel"):
                             lfo_max = int(vessel.resources.max("LiquidFuel"))
                             lfo_amo = int(vessel.resources.amount("LiquidFuel"))
-                            lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100)
+                            lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100 * 1000)
                         else:
                             lfo_max = 0
                             lfo_amo = 0
                             lfo_prc = 0
 
                         dsky_send(lfo_max, lfo_amo, lfo_prc)
+
+                    case _:
+                          dsky_send_empty_string()
 
             # Verb 3 = Take off
             case 3:
@@ -412,12 +421,45 @@ while handshake_in == "WAITING\n":
 
                     # Noun 2 = Mean altitude + apoapsis + inclination
                     case 2:
-                        dsky_send(int(vessel.flight().mean_altitude), int(vessel.orbit.apoapsis), int(vessel.orbit.inclination))
+                        inc = int((vessel.orbit.inclination * 180 / math.pi) * 1000) # Convert radians to degrees
+                        dsky_send(int(vessel.flight().mean_altitude), int(vessel.orbit.apoapsis), inc)
 
                     # Noun 3 = Apoapsis + periapsis + inclination
                     case 3:
-                        dsky_send(int(vessel.orbit.apoapsis), int(vessel.orbit.periapsis), int(vessel.orbit.inclination))
+                        inc = int((vessel.orbit.inclination * 180 / math.pi) * 1000) # Convert radians to degrees
+                        dsky_send(int(vessel.orbit.apoapsis_altitude), int(vessel.orbit.periapsis_altitude), inc)
 
+                    case _:
+                        dsky_send_empty_string()
+
+            # Verb 4 = Maneuver
+            case 4:
+                if len(vessel.control.nodes) == 0:
+                    dsky_send_empty_string()
+                else:
+                    next_node = vessel.control.nodes[0]
+                    match noun:
+                        # Verb 1 = Time to node [h:m:s]
+                        case 1:
+                            ttn = int(next_node.time_to)
+                            ttn = sec_to_hhmmss(ttn)
+                            dsky_send(ttn[0], ttn[1], ttn[2])
+
+                        # Verb 2 = Prograde, normal, radial
+                        case 2:
+                            dsky_send(int(next_node.prograde), int(next_node.normal), int(next_node.radial))
+
+                        # Verb 3 = Delta v, remaining Delta v, time to node [s]
+                        case 3:
+                            dsky_send(int(next_node.delta_v * 1000), int(next_node.remaining_delta_v * 1000), int(next_node.time_to))
+
+                        # Verb 4 = Result apoapsis, periapsis, inclination
+                        case 4:
+                            inc = int((next_node.orbit.inclination * 180 / math.pi) * 1000) # Convert radians to degrees
+                            dsky_send(int(next_node.orbit.apoapsis_altitude), int(next_node.orbit.periapsis_altitude), inc)
+
+                        case _:
+                            dsky_send_empty_string()
 
             # Verb 5 = Landing
             case 5:
@@ -425,7 +467,7 @@ while handshake_in == "WAITING\n":
                     # Noun 1 = Surface altitude + surface speed + LFO amount [%]
                     case 1:
                         if vessel.resources.has_resource("LiquidFuel"):
-                            lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100)
+                            lfo_prc = int(vessel.resources.amount("LiquidFuel") / vessel.resources.max("LiquidFuel") * 100 * 1000)
                             dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed), lfo_prc)
                         else:
                             dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).speed), 0)
@@ -434,14 +476,19 @@ while handshake_in == "WAITING\n":
                     case 2:
                         dsky_send(int(vessel.flight().surface_altitude), int(vessel.flight(srf_frame).vertical_speed), int(vessel.flight(srf_frame).horizontal_speed))
 
+                    case _:
+                        dsky_send_empty_string()
+
             # Testing output
             case 99:
                 match noun:
                     case 2:
                         dsky_send(tst, 0, 0)
                         tst += 1
+                    case _:
+                        dsky_send_empty_string()
 
             case _:
-                dsky_send(0, 0, 0)
+                dsky_send_empty_string()
     else:
         dsky_send_empty_string()

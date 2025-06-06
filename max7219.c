@@ -167,12 +167,12 @@ void display_number(uint8_t chip, uint8_t display, int64_t number) {
             spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[0]);
             spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[0]);
             spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[0]);
-        } else { // Display positive number
-            if (number < -999999999999999999) { // we're not able to display number <= 10*10^17
-                spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
+        } else { // Display negative number
+            if (number < -999999999999999999) { // we're not able to display number <= -10*10^17
+                spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]); // -
                 spi_send_data(chip, REG_DIGIT1 + (display * 4), CODE_BLANK);
-                spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[17]);
-                spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[19]);
+                spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[18]); // L
+                spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[20]); // O
             } else {
                 number = llabs(number);
                 uint8_t digits[3];
@@ -216,13 +216,18 @@ void display_number(uint8_t chip, uint8_t display, int64_t number) {
     }
 }
 
-//Function displays 2-digit number on one half of the display
+// Function displays 2-digit number on one half of the display
 void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8_t number) {
     if (number > 99) {
         return; // We're not able to display numb. > 99
     } else if ((number < 10)) { // Direct number's display if it's < 10
-        spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[0]);
-        spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[number]);
+        if(half == 0) {
+            spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[0]);
+            spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[number] + CODE_DP);
+        } else {
+            spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[0]);
+            spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[number]);
+        }
     } else {
         uint8_t digits[2];
 
@@ -232,9 +237,141 @@ void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8
             number /= 10;
         }
 
-        // Display number
-        spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[digits[0]]);
-        spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[digits[1]]);
+        // Display number, halves are separated by decimal dot
+        if(half == 0) {
+            spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[digits[0]]);
+            spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[digits[1]] + CODE_DP);
+        } else {
+            spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[digits[0]]);
+            spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[digits[1]]);
+        }
+    }
+}
+
+// Displays float number between <-999; 9999>
+void display_float_number(uint8_t chip, uint8_t display, float number) {
+    if((display < 0) || (display > 1))
+        return; // invalid display number
+    else {
+        uint32_t dec_number = (uint32_t)fabs(((number - (int)number) * 10000));
+        uint8_t num_digits_int = ((int)number == 0) ? 1 : (uint8_t) log10((double) fabsf(number)) + 1; // Calc number of digits (int part of number)
+
+        if(number > 0) { // Display positive number
+            if(number >= 10000) { // We're not able to display number >= 10 000
+                spi_send_data(chip, REG_DIGIT0 + (display * 4), CODE_BLANK); 
+                spi_send_data(chip, REG_DIGIT1 + (display * 4), CODE_BLANK);
+                spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[16]); // h
+                spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[1]); // I
+            } else {
+                uint8_t digits_int[4], digits_dec[4];
+
+                for (register uint8_t i = num_digits_int; i > 0; i--) {
+                    if (i <= 4) {
+                        digits_int[i - 1] = (int)number % 10; // We're going to display first 4 digits of the number
+                    }
+                    number /= 10;
+                }
+
+                for(register uint8_t i = 4; i > 0; i--) {
+                    digits_dec[i - 1] = (int)dec_number % 10;
+                    dec_number /= 10;
+                }
+
+                switch (num_digits_int) {
+                case 0:
+                    spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[0] + CODE_DP);
+                    spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_dec[0]]);
+                    spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_dec[1]]);
+                    spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[2]]);
+                    break;
+
+                case 1:
+                    spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[digits_int[0]] + CODE_DP);
+                    spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_dec[0]]);
+                    spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_dec[1]]);
+                    spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[2]]);
+                    break;
+
+                case 2:
+                    spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[digits_int[0]]);
+                    spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_int[1]] + CODE_DP);
+                    spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_dec[0]]);
+                    spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[1]]);
+                    break;
+
+                case 3:
+                    spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[digits_int[0]]);
+                    spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_int[1]]);
+                    spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_int[2]] + CODE_DP);
+                    spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[0]]);
+                    break;
+                
+                default:
+                    spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[digits_int[0]]);
+                    spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_int[1]]);
+                    spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_int[2]]);
+                    spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_int[3]]);
+                    break;
+                }
+            }
+        } else if(number == 0) { // Direct 0 display
+            spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[0]);
+            spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[0]);
+            spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[0]);
+            spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[0]);
+        } else {
+            if(number <= -1000) {
+                spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]); // -
+                spi_send_data(chip, REG_DIGIT1 + (display * 4), CODE_BLANK);
+                spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[18]); // L
+                spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[20]); // O
+            } else {
+                number = fabsf(number);
+                uint8_t digits_int[3], digits_dec[4];
+
+                for (register uint8_t i = num_digits_int; i > 0; i--) {
+                    if (i <= 3) {
+                        digits_int[i - 1] = (int)number % 10; // We're going to display first 4 digits of the number
+                    }
+                    number /= 10;
+                }
+
+                for(register uint8_t i = 4; i > 0; i--) {
+                    digits_dec[i - 1] = (int)dec_number % 10;
+                    dec_number /= 10;
+                }
+
+                switch (num_digits_int) {
+                    case 0:
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
+                        spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[0] + CODE_DP);
+                        spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_dec[0]]);
+                        spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[1]]);
+                        break;
+
+                    case 1:
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
+                        spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_int[0]] + CODE_DP);
+                        spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_dec[0]]);
+                        spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[1]]);
+                        break;
+
+                    case 2:
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
+                        spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_int[0]]);
+                        spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_int[1]] + CODE_DP);
+                        spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_dec[0]]);
+                        break;
+                    
+                    default:
+                        spi_send_data(chip, REG_DIGIT0 + (display * 4), code_table[26]);
+                        spi_send_data(chip, REG_DIGIT1 + (display * 4), code_table[digits_int[0]]);
+                        spi_send_data(chip, REG_DIGIT2 + (display * 4), code_table[digits_int[1]]);
+                        spi_send_data(chip, REG_DIGIT3 + (display * 4), code_table[digits_int[2]]);
+                        break;
+                }
+            }
+        }
     }
 }
 
@@ -245,9 +382,9 @@ void welcome_message_print() {
     spi_send_data(0, REG_DIGIT4, code_table[24]); // v
     spi_send_data(0, REG_DIGIT5, code_table[14]); // E
     spi_send_data(0, REG_DIGIT6, code_table[22]); // r
-    spi_send_data(1, REG_DIGIT0, code_table[0]);  // 0
-    spi_send_data(1, REG_DIGIT2, CODE_BLANK);     // 
-    spi_send_data(1, REG_DIGIT3, code_table[3]);  // 3
+    spi_send_data(1, REG_DIGIT0, code_table[0] + CODE_DP);  // 0.
+    spi_send_data(1, REG_DIGIT1, code_table[3] + CODE_DP);  // 3.
+    spi_send_data(1, REG_DIGIT2, code_table[1]);  // 3
 
     sleep_ms(2000);
 }

@@ -42,7 +42,8 @@ int main() {
     uart_handshake();
 
     verb = 0, noun = 0;
-    display_number(0, 0, 0);
+    display_two_digit_number(0, 0, 0, 0);
+    display_two_digit_number(0, 0, 1, 0);
 
     // Timer for periodical sending data via UART init
     struct repeating_timer timer_uart_send;
@@ -95,7 +96,18 @@ int main() {
             break;
         
         case 1:
-            if((noun > 0) && (noun <= 13)) {
+            if(noun == 2) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_float_number(0, 1, (float)flight_data.num1 / 1000);
+                    display_float_number(1, 0, (float)flight_data.num2 / 1000);
+                    display_float_number(1, 1, (float)flight_data.num3 / 1000);
+                }
+            } else {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -106,16 +118,33 @@ int main() {
                     display_number(1, 0, flight_data.num2);
                     display_number(1, 1, flight_data.num3);
                 }
-            } else {
-                led_update(flight_data);
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
             }
             break;
 
         case 2:
-            if((noun > 0) && (noun <= 9)) {
+            if(noun == 6) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_float_number(0, 1, (float)flight_data.num1 / 1000);
+                    display_float_number(1, 0, (float)flight_data.num2 / 1000);
+                    display_float_number(1, 1, (float)flight_data.num3 / 1000);
+                }
+            } else if((noun >= 7) && (noun <= 9)) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_float_number(1, 1, (float)flight_data.num3 / 1000);
+                }
+            } else {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -126,16 +155,22 @@ int main() {
                     display_number(1, 0, flight_data.num2);
                     display_number(1, 1, flight_data.num3);
                 }
-            } else {
-                led_update(flight_data);
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
             }
             break;
 
         case 3:
-            if((noun > 0) && (noun <= 3)) {
+            if((noun == 2) || (noun == 3)) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_float_number(1, 1, (float)flight_data.num3 / 1000);
+                }
+            } else {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -146,16 +181,65 @@ int main() {
                     display_number(1, 0, flight_data.num2);
                     display_number(1, 1, flight_data.num3);
                 }
-            } else {
-                led_update(flight_data);
+            }
+            break;
+
+        case 4:
+            if(noun == 3) {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+
+                    float dv = (float)flight_data.num1 / 1000;
+                    float rdv = (float)flight_data.num2 / 1000;
+
+                    (dv < 10000) ? display_float_number(0, 1, dv) : display_number(0, 1, (int64_t)dv);
+                    (rdv < 10000) ? display_float_number(1, 0, rdv) : display_number(1, 0, (int64_t)rdv);
+
+                    display_number(1, 1, flight_data.num3);
+                }
+            } else if(noun == 4) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_float_number(1, 1, (float)flight_data.num3 / 1000);
+                }
+            } else {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_number(0, 1, flight_data.num1);
+                    display_number(1, 0, flight_data.num2);
+                    display_number(1, 1, flight_data.num3);
+                }
             }
+
             break;
         
         case 5:
-            if((noun > 0) && (noun <= 2)) {
+            if(noun == 1) {
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+                while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_float_number(0, 1, (float)flight_data.num1 / 1000);
+                    display_number(1, 0, flight_data.num2);
+                    display_number(1, 1, flight_data.num3);
+                }
+            } else {
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -166,11 +250,6 @@ int main() {
                     display_number(1, 0, flight_data.num2);
                     display_number(1, 1, flight_data.num3);
                 }
-            } else {
-                led_update(flight_data);
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
             }
             break;
 
@@ -198,10 +277,19 @@ int main() {
                 }
                 break;
             
+            // Display float
+            case 3:
+                display_float_number(0, 1, 643.52);
+                display_float_number(1, 0, 0.0);
+                display_float_number(1, 1, -0.64352);
             default:
                 break;
             }
         default:
+            led_update(flight_data);
+            clear_display(0, 1);
+            clear_display(1, 0);
+            clear_display(1, 1);
             break;
         }
     }

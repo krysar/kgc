@@ -35,30 +35,30 @@ TODO
 | 01   | 02   | Orbital inclination [°]                   |                        | TODO: float                |
 |      |      | Orbital eccentricity [°]                  |                        | TODO: float                |
 |      |      | Mean anomaly [°]                          |                        | TODO: float                |
-| 01   | 03   | Time to apoapsis [sec]                    |                        |                            |
+| 01   | 03   | Time to apoapsis [hrs]                    |                        |                            |
 |      |      | Time to apoapsis [min]                    |                        |                            |
+|      |      | Time to apoapsis [sec]                    |                        |                            |
+| 01   | 04   | Time to apoapsis [days]                   |                        |                            |
 |      |      | Time to apoapsis [hrs]                    |                        |                            |
-| 01   | 04   | Time to apoapsis [min]                    |                        |                            |
-|      |      | Time to apoapsis [hrs]                    |                        |                            |
-|      |      | Time to apoapsis [days]                   |                        | Kerbin days                |
-| 01   | 05   | Time to periapsis [sec]                   |                        |                            |
+|      |      | Time to apoapsis [min]                    |                        | Kerbin days                |
+| 01   | 05   | Time to periapsis [hrs]                   |                        |                            |
 |      |      | Time to periapsis [min]                   |                        |                            |
+|      |      | Time to periapsis [sec]                   |                        |                            |
+| 01   | 06   | Time to periapsis [days]                  |                        |                            |
 |      |      | Time to periapsis [hrs]                   |                        |                            |
-| 01   | 06   | Time to periapsis [min]                   |                        |                            |
-|      |      | Time to periapsis [hrs]                   |                        |                            |
-|      |      | Time to periapsis [days]                  |                        | Kerbin days                |
-| 01   | 07   | Orbital period [sec]                      |                        |                            |
+|      |      | Time to periapsis [min]                   |                        | Kerbin days                |
+| 01   | 07   | Orbital period [hrs]                      |                        |                            |
 |      |      | Orbital period [min]                      |                        |                            |
+|      |      | Orbital period [sec]                      |                        |                            |
+| 01   | 08   | Orbital period [days]                     |                        |                            |
 |      |      | Orbital period [hrs]                      |                        |                            |
-| 01   | 08   | Orbital period [min]                      |                        |                            |
-|      |      | Orbital period [hrs]                      |                        |                            |
-|      |      | Orbital period [days]                     |                        | Kerbin days                |
-| 01   | 09   | Time to sphere of influence change [sec]  |                        | Crashes when no SOI change |
+|      |      | Orbital period [min]                      |                        | Kerbin days                |
+| 01   | 09   | Time to sphere of influence change [hrs]  |                        |                            |
 |      |      | Time to sphere of influence change [min]  |                        |                            |
+|      |      | Time to sphere of influence change [sec]  |                        |                            |
+| 01   | 10   | Time to sphere of influence change [days] |                        |                            |
 |      |      | Time to sphere of influence change [hrs]  |                        |                            |
-| 01   | 10   | Time to sphere of influence change [min]  |                        | Crashes when no SOI change |
-|      |      | Time to sphere of influence change [hrs]  |                        |                            |
-|      |      | Time to sphere of influence change [days] |                        | Kerbin days                |
+|      |      | Time to sphere of influence change [min]  |                        | Kerbin days                |
 | 01   | 11   | Heading [°]                               |                        | TODO: check ref. frame     |
 |      |      | Pitch [°]                                 |                        | TODO: check ref. frame     |
 |      |      | Roll [°]                                  |                        | TODO: check ref. frame     |
@@ -68,12 +68,12 @@ TODO
 | 01   | 13   | Orbital speed [m/s]                       |                        |                            |
 |      |      | Surface speed [m/s]                       |                        |                            |
 | 02   | 00   |                                           | No op                  |                            |
-| 02   | 01   | Mission elapsed time [sec]                |                        |                            |
+| 02   | 01   | Mission elapsed time [hrs]                |                        |                            |
 |      |      | Mission elapsed time [min]                |                        |                            |
-|      |      | Mission elapsed time [hrs]                |                        | Strange bug                |
-| 02   | 02   | Mission elapsed time [min]                |                        |                            |
+|      |      | Mission elapsed time [sec]                |                        | Strange bug                |
+| 02   | 02   | Mission elapsed time [days]               |                        |                            |
 |      |      | Mission elapsed time [min]                |                        | Strange bug                |
-|      |      | Mission elapsed time [days]               |                        | Strange bug                |
+|      |      | Mission elapsed time [hrs]                |                        | Strange bug                |
 | 02   | 03   | Mass [kg]                                 |                        |                            |
 |      |      | Available thurst [N]                      |                        |                            |
 |      |      | Specific impulse [sec]                    |                        |                            |
@@ -104,6 +104,18 @@ TODO
 | 03   | 03   | Apoapsis [m]                              |                        |                            |
 |      |      | Periapsis [m]                             |                        |                            |
 |      |      | Orbital inclination [°]                   |                        |                            |
+| 04   | 01   | Time to node [hrs]                        |                        |                            |
+|      |      | Time to node [min]                        |                        |                            |
+|      |      | Time to node [sec]                        |                        |                            |
+| 04   | 02   | Δv magnitude - prograde direction [m/s]   |                        |                            |
+|      |      | Δv magnitude - normal direction [m/s]     |                        |                            |
+|      |      | Δv magnitude - radial direction [m/s]     |                        |                            |
+| 04   | 03   | Δv [m/s]                                  |                        |                            |
+|      |      | Remaining Δv [m/s]                        |                        |                            |
+|      |      | Time to node [sec]                        |                        |                            |
+| 04   | 04   | Result apoapsis [m]                       |                        |                            |
+|      |      | Result periapsis [m]                      |                        |                            |
+|      |      | Result inclination [°]                    |                        |                            |
 | 05   | 01   | Altitude above surface [m]                |                        |                            |
 |      |      | Surface speed [m/s]                       |                        |                            |
 |      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
