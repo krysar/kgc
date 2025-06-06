@@ -118,7 +118,7 @@ TODO
 |      |      | Result inclination [°]                    |                        |                            |
 | 05   | 01   | Altitude above surface [m]                |                        |                            |
 |      |      | Surface speed [m/s]                       |                        |                            |
-|      |      | Liquid fuel amount [%]                    |                        | TODO: float                |
+|      |      | Liquid fuel amount [%]                    |                        |                            |
 | 05   | 02   | Altitude above surface [m]                |                        |                            |
 |      |      | Vertical speed [m/s]                      |                        |                            |
 |      |      | Horizontal speed [m/s]                    |                        |                            |

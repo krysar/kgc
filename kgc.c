@@ -235,9 +235,9 @@ int main() {
                 while (keypad_status != KEY_STAT_PRG_CHANGE) {
                     flight_data = uart_data_decoder(uart_str_in);
                     led_update(flight_data);
-                    display_float_number(0, 1, (float)flight_data.num1 / 1000);
+                    display_number(0, 1, flight_data.num1);
                     display_number(1, 0, flight_data.num2);
-                    display_number(1, 1, flight_data.num3);
+                    display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else {
                 clear_display(0, 1);
