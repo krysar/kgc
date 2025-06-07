@@ -292,7 +292,7 @@ while handshake_in == "WAITING\n":
                         dsky_send(int(vessel.orbit.speed), int(vessel.flight(srf_frame).speed), 0)
 
                     case _:
-                        dsky_send_empty_string()
+                        dsky_send(0,0,0)
 
             # Verb 2 = Display vessel info
             case 2:
@@ -410,7 +410,7 @@ while handshake_in == "WAITING\n":
                         dsky_send(lfo_max, lfo_amo, lfo_prc)
 
                     case _:
-                          dsky_send_empty_string()
+                          dsky_send(0,0,0)
 
             # Verb 3 = Take off
             case 3:
@@ -430,7 +430,7 @@ while handshake_in == "WAITING\n":
                         dsky_send(int(vessel.orbit.apoapsis_altitude), int(vessel.orbit.periapsis_altitude), inc)
 
                     case _:
-                        dsky_send_empty_string()
+                        dsky_send(0,0,0)
 
             # Verb 4 = Maneuver
             case 4:
@@ -459,7 +459,7 @@ while handshake_in == "WAITING\n":
                             dsky_send(int(next_node.orbit.apoapsis_altitude), int(next_node.orbit.periapsis_altitude), inc)
 
                         case _:
-                            dsky_send_empty_string()
+                            dsky_send(0,0,0)
 
             # Verb 5 = Landing
             case 5:
@@ -477,7 +477,7 @@ while handshake_in == "WAITING\n":
                         dsky_send(int(vessel.flight().surface_altitude), int(-vessel.flight(srf_frame).vertical_speed * 1000), int(vessel.flight(srf_frame).horizontal_speed * 1000))
 
                     case _:
-                        dsky_send_empty_string()
+                        dsky_send(0,0,0)
 
             # Testing output
             case 99:
@@ -489,6 +489,6 @@ while handshake_in == "WAITING\n":
                         dsky_send_empty_string()
 
             case _:
-                dsky_send_empty_string()
+                dsky_send(0,0,0)
     else:
         dsky_send_empty_string()
