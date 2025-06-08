@@ -11,6 +11,7 @@
 
 #include "keypad.h"
 #include "max7219.h"
+#include "led.h"
 
 uint8_t keypad_status = 0, verb = 0, noun = 0, request_num = NO_NUM_TO_READ, change_register;
 uint8_t verb_choice[] = {254, 254}, noun_choice[] = {254, 254};
@@ -40,52 +41,12 @@ int64_t display_program(alarm_id_t id, void *user_data) {
     return 0;
 }
 
-uint16_t revert_number(uint16_t number) {
-    uint16_t rev = 0, rem;
-
-    while (number != 0) {
-        rem = number % 10;
-        rev = rev * 10 + rem;
-        number /= 10;
-    }
-
-    return rev;
-}
-
 int64_t debounce_unset(alarm_id_t id, void *user_data) {
     debounce = false;
     return 0;
 }
 
 uint8_t key_evaluate(uint8_t pressed_key) {
-    /* if(keypad_status == KEY_STAT_NUM_INSERT) {
-        if(pressed_key == KEY_ENTER) {
-            insert[0] = revert_number(insert[0]);
-            spi_send_data(0, REG_DIGIT4, CODE_BLANK);
-            spi_send_data(0, REG_DIGIT5, CODE_BLANK);
-            spi_send_data(0, REG_DIGIT6, CODE_BLANK);
-            spi_send_data(0, REG_DIGIT7, CODE_BLANK);
-            return KEY_STAT_NUM_INSERTED; // number inserted
-        } else if(pressed_key <= 9) {
-            if (insert[0] == 0) {
-                insert[0] = pressed_key;
-                spi_send_data(0, REG_DIGIT4, code_table[pressed_key]);
-            } else if ((insert[0] > 0) && (insert[0] < 10)) {
-                insert[0] += pressed_key * 10;
-                spi_send_data(0, REG_DIGIT5, code_table[pressed_key]);
-            } else if ((insert[0] >= 10) && (insert[0] < 100)) {
-                insert[0] += pressed_key * 100;
-                spi_send_data(0, REG_DIGIT6, code_table[pressed_key]);
-            } else if((insert[0] >= 100) && (insert[0] < 1000)) {
-                insert[0] += pressed_key * 1000;
-                spi_send_data(0, REG_DIGIT7, code_table[pressed_key]);
-            } else {
-                //todo: OTR LED blinking
-            }
-        }
-
-        return KEY_STAT_NUM_INSERT;
-    } */
     // KEY_VERB is pressed without any previous verb operation
     // Preparation for insert 1st verb digit
     if ((pressed_key == KEY_VERB) && (verb_choice[0] == 254) && (verb_choice[1] == 254)) {
@@ -206,6 +167,28 @@ uint8_t read_number(uint8_t pressed_key) {
         }
 
         return KEY_STAT_NUM_INSERTING;
+    } else if(strlen(inserted_num_buf) == INSERTED_NUM_BUF_SIZE - 1) {
+        if(pressed_key == KEY_ENTER) {
+            char *buf;
+            inserted_num_buf[strlen(inserted_num_buf)] = '\0';
+            inserted_num[request_num - 1] = strtof(inserted_num_buf, &buf);
+
+            printf("Inserted! String is: %s\n Num is: %f\nChars is: ", inserted_num_buf, inserted_num[request_num - 1]);
+
+            for(register uint8_t i = 0; i <= strlen(inserted_num_buf); i++) {
+                printf("%02hhX ", inserted_num_buf[i]);
+            }
+
+
+            memset(inserted_num_buf, 0, INSERTED_NUM_BUF_SIZE);
+
+            gpio_put(LED_OTR, false);
+            request_num = READ_NUM_INSERTED;
+            dots_count = 0;
+            return KEY_STAT_NO_CHANGE;
+        } else {
+            gpio_put(LED_OTR, true);
+        }
     } else {
         if(pressed_key <= 9) {
             inserted_num_buf[strlen(inserted_num_buf)] = pressed_key + 0x30;

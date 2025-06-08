@@ -309,6 +309,50 @@ int main() {
 
                 break;
 
+            case 5:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+
+                sleep_ms(1000);
+
+                display_underscores(0, 1);
+                request_num = READ_NUM_DISP_1;
+                while (request_num != READ_NUM_INSERTED) {
+                    sleep_ms(50);
+                }
+                
+                display_underscores(1, 0);
+                request_num = READ_NUM_DISP_2;
+                while (request_num != READ_NUM_INSERTED) {
+                    sleep_ms(50);
+                }
+
+                display_underscores(1, 1);
+                request_num = READ_NUM_DISP_3;
+                while (request_num != READ_NUM_INSERTED) {
+                    sleep_ms(50);
+                }
+
+                request_num = NO_NUM_TO_READ;
+                noun = 6;
+
+                break;
+
+            case 6:
+                display_two_digit_number(0, 0, 0, verb);
+                display_two_digit_number(0, 0, 1, noun);
+
+                while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                    flight_data = uart_data_decoder(uart_str_in);
+                    led_update(flight_data);
+                    display_float_number(0, 1, inserted_num[0]);
+                    display_float_number(1, 0, inserted_num[1]);
+                    display_float_number(1, 1, inserted_num[2]);
+                }
+
+                break;
+
             default:
                 break;
             }
