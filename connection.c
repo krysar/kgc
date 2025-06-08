@@ -42,10 +42,10 @@ void uart_irq_handler() {
     char uart_str_in_buf[UART_STR_IN_BUF_SIZE] = "";
     time_since_last_connection = 0;
     // memset(uart_str_in, 0, UART_STR_IN_BUF_SIZE);
-    printf("Incomming message: ");
+    // printf("Incomming message: ");
     while (uart_is_readable_within_us(UART_ID, 850)) {
         char ch_buf = uart_getc(UART_ID);
-        printf("%c", ch_buf);
+        // printf("%c", ch_buf);
         uart_str_in_buf[strlen(uart_str_in_buf)] = ch_buf;
         /*if(ch_buf == '\n')
             break;*/
@@ -57,8 +57,8 @@ void uart_irq_handler() {
         uart_str_in[strlen(uart_str_in)] = '\0';
     }
     
-    printf("strlen: %d\n", strlen(uart_str_in));
-    printf("\n");
+    // printf("strlen: %d\n", strlen(uart_str_in));
+    // printf("\n");
 }
 
 bool uart_handshake() {

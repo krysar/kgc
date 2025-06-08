@@ -44,5 +44,6 @@ void display_number(uint8_t chip,uint8_t display, int64_t number);
 void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8_t number);
 void display_float_number(uint8_t chip, uint8_t display, float number);
 void welcome_message_print();
+void display_underscores(uint8_t chip, uint8_t display);
 
 #endif //KGC_MAX7219_H

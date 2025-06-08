@@ -384,7 +384,35 @@ void welcome_message_print() {
     spi_send_data(0, REG_DIGIT6, code_table[22]); // r
     spi_send_data(1, REG_DIGIT0, code_table[0] + CODE_DP);  // 0.
     spi_send_data(1, REG_DIGIT1, code_table[3] + CODE_DP);  // 3.
-    spi_send_data(1, REG_DIGIT2, code_table[1]);  // 3
+    spi_send_data(1, REG_DIGIT2, code_table[2]);  // 2
 
     sleep_ms(2000);
+}
+
+void display_underscores(uint8_t chip, uint8_t display) {
+    if(chip == 0) {
+        if(display == 0) {
+            spi_send_data(0, REG_DIGIT0, code_table[25]);
+            spi_send_data(0, REG_DIGIT1, code_table[25]);
+            spi_send_data(0, REG_DIGIT2, code_table[25]);
+            spi_send_data(0, REG_DIGIT3, code_table[25]);
+        } else {
+            spi_send_data(0, REG_DIGIT4, code_table[25]);
+            spi_send_data(0, REG_DIGIT5, code_table[25]);
+            spi_send_data(0, REG_DIGIT6, code_table[25]);
+            spi_send_data(0, REG_DIGIT7, code_table[25]);
+        }
+    } else {
+        if(display == 0) {
+            spi_send_data(1, REG_DIGIT0, code_table[25]);
+            spi_send_data(1, REG_DIGIT1, code_table[25]);
+            spi_send_data(1, REG_DIGIT2, code_table[25]);
+            spi_send_data(1, REG_DIGIT3, code_table[25]);
+        } else {
+            spi_send_data(1, REG_DIGIT4, code_table[25]);
+            spi_send_data(1, REG_DIGIT5, code_table[25]);
+            spi_send_data(1, REG_DIGIT6, code_table[25]);
+            spi_send_data(1, REG_DIGIT7, code_table[25]);
+        }
+    }
 }

@@ -3,15 +3,20 @@
 */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
 #include "keypad.h"
 #include "max7219.h"
 
-uint8_t keypad_status = 0, verb = 0, noun = 0, change_register;
+uint8_t keypad_status = 0, verb = 0, noun = 0, request_num = NO_NUM_TO_READ, change_register;
 uint8_t verb_choice[] = {254, 254}, noun_choice[] = {254, 254};
-uint16_t insert[3] = {};
+uint8_t dots_count = 0;
+char inserted_num_buf[INSERTED_NUM_BUF_SIZE] = "";
+float inserted_num[3] = {0};
 bool debounce = false;
 
 // Init function for keypad
@@ -53,7 +58,7 @@ int64_t debounce_unset(alarm_id_t id, void *user_data) {
 }
 
 uint8_t key_evaluate(uint8_t pressed_key) {
-    if(keypad_status == KEY_STAT_NUM_INSERT) {
+    /* if(keypad_status == KEY_STAT_NUM_INSERT) {
         if(pressed_key == KEY_ENTER) {
             insert[0] = revert_number(insert[0]);
             spi_send_data(0, REG_DIGIT4, CODE_BLANK);
@@ -80,12 +85,12 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         }
 
         return KEY_STAT_NUM_INSERT;
-    }
+    } */
     // KEY_VERB is pressed without any previous verb operation
     // Preparation for insert 1st verb digit
     if ((pressed_key == KEY_VERB) && (verb_choice[0] == 254) && (verb_choice[1] == 254)) {
         spi_send_data(0, REG_DIGIT0, code_table[25]);
-        spi_send_data(0, REG_DIGIT1, code_table[25]);
+        spi_send_data(0, REG_DIGIT1, code_table[25] + CODE_DP);
         verb_choice[0] = 255;
         return KEY_STAT_NO_CHANGE;
         // KEY_NOUN is pressed without any previous noun operation
@@ -97,7 +102,7 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         return KEY_STAT_NO_CHANGE;
         // Inserting 1st verb digit, preparation for insert 2nd
     } else if (verb_choice[0] == 255) {
-        if (pressed_key >= 10) // We're accepting 0 - 10 keys only
+        if (pressed_key >= 10) // We're accepting 0 - 9 keys only
             return KEY_STAT_NO_CHANGE;
         verb_choice[0] = pressed_key;
         verb_choice[1] = 255;
@@ -116,7 +121,7 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         if(pressed_key >= 10)
             return KEY_STAT_NO_CHANGE;
         verb_choice[1] = pressed_key;
-        spi_send_data(0, REG_DIGIT1, code_table[pressed_key]);
+        spi_send_data(0, REG_DIGIT1, code_table[pressed_key] + CODE_DP);
         return KEY_STAT_NO_CHANGE;
         // Inserting 2nd noun digit
     } else if (noun_choice[1] == 255) {
@@ -164,6 +169,96 @@ uint8_t key_evaluate(uint8_t pressed_key) {
     }
 }
 
+uint8_t read_number(uint8_t pressed_key) {
+    uint8_t disp = (request_num <= READ_NUM_DISP_1)? 0 : 1;
+
+    if(strlen(inserted_num_buf) == 0) {
+        if(pressed_key <= 9) {
+            inserted_num_buf[0] = pressed_key + 0x30;
+            printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
+            if(request_num == READ_NUM_DISP_1) {
+                spi_send_data(0, REG_DIGIT4, code_table[pressed_key]);
+            } else if(request_num == READ_NUM_DISP_2) {
+                spi_send_data(1, REG_DIGIT0, code_table[pressed_key]);
+            } else {
+                spi_send_data(1, REG_DIGIT4, code_table[pressed_key]);
+            }
+        } else if(pressed_key == '-') {
+            inserted_num_buf[0] = pressed_key;
+            printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
+            if(request_num == READ_NUM_DISP_1) {
+                spi_send_data(0, REG_DIGIT4, code_table[26]);
+            } else if(request_num == READ_NUM_DISP_2) {
+                spi_send_data(1, REG_DIGIT0, code_table[26]);
+            } else {
+                spi_send_data(1, REG_DIGIT4, code_table[26]);
+            }
+        } else if(pressed_key == '.') {
+            inserted_num_buf[0] = pressed_key;
+            printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
+            if(request_num == READ_NUM_DISP_1) {
+                spi_send_data(0, REG_DIGIT4, code_table[0] + CODE_DP);
+            } else if(request_num == READ_NUM_DISP_2) {
+                spi_send_data(1, REG_DIGIT0, code_table[0] + CODE_DP);
+            } else {
+                spi_send_data(1, REG_DIGIT4, code_table[0] + CODE_DP);
+            }
+        }
+
+        return KEY_STAT_NUM_INSERTING;
+    } else {
+        if(pressed_key <= 9) {
+            inserted_num_buf[strlen(inserted_num_buf)] = pressed_key + 0x30;
+            printf("%c, Strlen: %d\n", inserted_num_buf[strlen(inserted_num_buf) - 1], strlen(inserted_num_buf));
+            if(strlen(inserted_num_buf) - dots_count < 5) {
+                if(request_num == READ_NUM_DISP_1) {
+                    spi_send_data(0, REG_DIGIT4 + strlen(inserted_num_buf) - 1 - dots_count, code_table[pressed_key]);
+                } else if(request_num == READ_NUM_DISP_2) {
+                    spi_send_data(1, REG_DIGIT0 + strlen(inserted_num_buf) - 1 - dots_count, code_table[pressed_key]);
+                } else {
+                    spi_send_data(1, REG_DIGIT4 + strlen(inserted_num_buf) - 1 - dots_count, code_table[pressed_key]);
+                }
+            }
+
+            return KEY_STAT_NUM_INSERTING;
+        } else if(pressed_key == '.') {
+            inserted_num_buf[strlen(inserted_num_buf)] = pressed_key;
+            printf("%c, Strlen: %d\n", inserted_num_buf[strlen(inserted_num_buf) - 1], strlen(inserted_num_buf));
+            if(strlen(inserted_num_buf) - dots_count < 5) {
+                char prev_digit = inserted_num_buf[strlen(inserted_num_buf) - 2];
+                if(request_num == READ_NUM_DISP_1) {
+                    spi_send_data(0, REG_DIGIT4 + strlen(inserted_num_buf) - 2 - dots_count, code_table[prev_digit - 0x30] + CODE_DP);
+                } else if(request_num == READ_NUM_DISP_2) {
+                    spi_send_data(1, REG_DIGIT0 + strlen(inserted_num_buf) - 2 - dots_count, code_table[prev_digit - 0x30] + CODE_DP);
+                } else {
+                    spi_send_data(1, REG_DIGIT4 + strlen(inserted_num_buf) - 2 - dots_count, code_table[prev_digit - 0x30] + CODE_DP);
+                }
+            }
+
+            dots_count++;
+
+            return KEY_STAT_NUM_INSERTING;
+        } else if(pressed_key == KEY_ENTER) {
+            char *buf;
+            inserted_num_buf[strlen(inserted_num_buf)] = '\0';
+            inserted_num[request_num - 1] = strtof(inserted_num_buf, &buf);
+
+            printf("Inserted! String is: %s\n Num is: %f\nChars is: ", inserted_num_buf, inserted_num[request_num - 1]);
+
+            for(register uint8_t i = 0; i <= strlen(inserted_num_buf); i++) {
+                printf("%02hhX ", inserted_num_buf[i]);
+            }
+
+
+            memset(inserted_num_buf, 0, INSERTED_NUM_BUF_SIZE);
+
+            request_num = READ_NUM_INSERTED;
+            dots_count = 0;
+            return KEY_STAT_NO_CHANGE;
+        }
+    }
+}
+
 void keypad_irq_handler(uint gpio, uint32_t events) {
     if (debounce == true)
         return; // Still debouncing
@@ -180,7 +275,14 @@ void keypad_irq_handler(uint gpio, uint32_t events) {
                     while (gpio_get(col[j])) {
                         // Do nothing while key is pressed
                     }
-                    keypad_status = key_evaluate(keymap[i][j]); // Then evaluate key meaning
+
+                    // Then evaluate key meaning
+                    // If there's request to insert number
+                    // keypad_status = (request_num == NO_NUM_TO_READ) ? key_evaluate(keymap[i][j]) : read_number(keymap[i][j]);
+                    if((request_num == NO_NUM_TO_READ) || (request_num == READ_NUM_INSERTED))
+                        keypad_status = key_evaluate(keymap[i][j]);
+                    else
+                        keypad_status = read_number(keymap[i][j]);
                     debounce = true;
                     add_alarm_in_ms(50, debounce_unset, NULL, false);
                 }

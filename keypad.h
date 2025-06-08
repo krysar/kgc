@@ -3,30 +3,41 @@
 
 #define KEY_VERB 10
 #define KEY_NOUN 11
-#define KEY_CORRECT 12
-#define KEY_ENTER   15
+#define KEY_CLR 12
+#define KEY_MINUS 45
+#define KEY_DOT 46
+#define KEY_ENTER 15
 
 #define KEY_STAT_NO_CHANGE 0
 #define KEY_STAT_PRG_CHANGE 1
-#define KEY_STAT_NUM_INSERT 2
-#define KEY_STAT_NUM_INSERTED 3
+#define KEY_STAT_NUM_INSERTING 2
 
-extern uint8_t keypad_status, verb, noun;
-extern uint16_t insert[3];
+#define NO_NUM_TO_READ 0
+#define READ_NUM_DISP_1 1
+#define READ_NUM_DISP_2 2
+#define READ_NUM_DISP_3 3
+#define READ_NUM_INSERTED 4
+
+#define INSERTED_NUM_BUF_SIZE 10
+
+extern uint8_t keypad_status, verb, noun, request_num;
+extern char inserted_num_buf[INSERTED_NUM_BUF_SIZE];
+extern float inserted_num[3];
 extern bool debounce;
 extern uint8_t verb_choice[], noun_choice[];
 static uint8_t col[4] = {28, 27, 26, 22}, row[4] = {21, 20, 16, 15};
-static uint8_t keymap[4][4] = {{1,  2, 3,  10},
-                               {4,  5, 6,  11},
-                               {7,  8, 9,  12},
-                               {13, 0, 14, 15}};
-
+static uint8_t keymap[4][4] = {{1,  2, 3,  10},     // 1, 2, 3, Verb
+                               {4,  5, 6,  11},     // 4, 5, 6, Noun
+                               {7,  8, 9,  12},     // 7, 8, 9, CLR
+                               {45, 0, 46, 15}};    // -, 0, ., Enter 
+ 
 void keypad_init();
-
 int64_t debounce_unset(alarm_id_t id, void *user_data);
 int64_t display_program(alarm_id_t id, void *user_data);
 uint16_t revert_number(uint16_t number);
 uint8_t key_evaluate(uint8_t pressed_key);
+uint8_t read_number(uint8_t pressed_key);
+
 void keypad_irq_handler(uint gpio, uint32_t events);
 
 #endif //KGC_KEYPAD_H

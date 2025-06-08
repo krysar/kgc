@@ -92,7 +92,7 @@ int main() {
                 clear_display(1, 0);
                 clear_display(1, 1);
                 break;
-            }
+            } 
             break;
         
         case 1:
@@ -282,6 +282,33 @@ int main() {
                 display_float_number(0, 1, 643.52);
                 display_float_number(1, 0, 0.0);
                 display_float_number(1, 1, -0.64352);
+            
+            // Testing number input
+            case 4:
+                clear_display(0, 1);
+                clear_display(1, 0);
+                clear_display(1, 1);
+
+                sleep_ms(1000);
+
+                display_underscores(1, 0);
+                request_num = READ_NUM_DISP_2;
+                
+                while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                    sleep_ms(200);
+                    if(request_num == READ_NUM_INSERTED) {
+                        sleep_ms(500);
+                        clear_display(0, 1);
+                        clear_display(1, 0);
+                        display_float_number(1, 1, inserted_num[1]);
+
+                        printf("ins num: %f\n", inserted_num[1]);
+                    }
+                }
+                request_num = NO_NUM_TO_READ;
+
+                break;
+
             default:
                 break;
             }
@@ -297,7 +324,7 @@ int main() {
 
 bool timer_uart_send_handler(__unused struct repeating_timer *t) {
     char buffer[50];
-    printf("Verb: %u Noun: %u\n", verb, noun);
+    // printf("Verb: %u Noun: %u\n", verb, noun);
     sprintf(buffer, "V:%u;N:%u\n", verb, noun);
     uart_puts(UART_ID, buffer);
 
