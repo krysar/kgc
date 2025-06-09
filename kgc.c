@@ -44,6 +44,7 @@ int main() {
     uart_handshake();
 
     verb = 0, noun = 0;
+    prev_verb = 0, prev_noun = 0;
     display_two_digit_number(0, 0, 0, 0);
     display_two_digit_number(0, 0, 1, 0);
 
@@ -99,6 +100,7 @@ int main() {
         
         case 1:
             if(noun == 2) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -110,6 +112,7 @@ int main() {
                     display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -125,6 +128,7 @@ int main() {
 
         case 2:
             if(noun == 6) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -136,6 +140,7 @@ int main() {
                     display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else if((noun >= 7) && (noun <= 9)) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -147,6 +152,7 @@ int main() {
                     display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -162,6 +168,7 @@ int main() {
 
         case 3:
             if((noun == 2) || (noun == 3)) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -173,6 +180,7 @@ int main() {
                     display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -188,6 +196,7 @@ int main() {
 
         case 4:
             if(noun == 3) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -204,6 +213,7 @@ int main() {
                     display_number(1, 1, flight_data.num3);
                 }
             } else if(noun == 4) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -215,6 +225,7 @@ int main() {
                     display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -231,6 +242,7 @@ int main() {
         
         case 5:
             if((noun == 1) || (noun == 2)) {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -242,6 +254,7 @@ int main() {
                     display_float_number(1, 1, (float)flight_data.num3 / 1000);
                 }
             } else {
+                SAVE_PREV_VERB_NOUN
                 clear_display(0, 1);
                 clear_display(1, 0);
                 clear_display(1, 1);
@@ -255,22 +268,36 @@ int main() {
             }
             break;
 
+        // Basic ship control
+        case 12:
+            sleep_ms(1500);
+            verb = prev_verb;
+            noun = prev_noun;
+            clear_display(0, 0);
+            add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+
+            break;
+
         // Testing verb
         case 99:
             switch (noun) {
                 // Display 3 static numbers
                 case 1:
-                    display_number(0, 1, 1234);
-                    display_number(1, 0, 5678);
-                    display_number(1, 1, 9012);
+                    SAVE_PREV_VERB_NOUN
+                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                        display_number(0, 1, 1234);
+                        display_number(1, 0, 5678);
+                        display_number(1, 1, 9012);
+                    }
                     break;
                 
                 // Display incrementing number from server
                 case 2:
+                    SAVE_PREV_VERB_NOUN
                     clear_display(0, 1);
                     clear_display(1, 0);
                     clear_display(1, 1);
-                    while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
                         flight_data = uart_data_decoder(uart_str_in);
                         led_update(flight_data);
                         display_number(0, 1, flight_data.num1);
@@ -281,9 +308,13 @@ int main() {
                 
                 // Display float
                 case 3:
-                    display_float_number(0, 1, 643.52);
-                    display_float_number(1, 0, 0.0);
-                    display_float_number(1, 1, -0.64352);
+                    SAVE_PREV_VERB_NOUN
+                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                        display_float_number(0, 1, 643.52);
+                        display_float_number(1, 0, 0.0);
+                        display_float_number(1, 1, -0.64352);
+                    }
+                    break;
                 
                 // Testing number input
                 case 4:
@@ -298,6 +329,7 @@ int main() {
                         clear_display(1, 0);
                         display_float_number(1, 1, insnum);
                     }
+                    SAVE_PREV_VERB_NOUN
 
                     break;
 

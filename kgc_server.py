@@ -1,6 +1,7 @@
 import krpc
 import krpc.attributes
 import krpc.types
+import krpc.utils
 import serial
 import math
 
@@ -160,7 +161,7 @@ def dsky_send_empty_string():
 
 # Main program:
 
-print("KGC 0.3.1")
+print("KGC 0.3.2")
 
 serial_port = input("Serial port? ")
 ser_conn = serial.Serial(serial_port, 115200)
@@ -169,7 +170,7 @@ ser_conn.stopbits = serial.STOPBITS_ONE
 ser_conn.parity = serial.PARITY_EVEN
 ser_conn.timeout = None
 
-krpc_conn = krpc.connect(name='KGC 0.3.1')
+krpc_conn = krpc.connect(name='KGC 0.3.2')
 if ser_conn.is_open == False:
     ser_conn.open()
 
@@ -435,7 +436,7 @@ while handshake_in == "WAITING\n":
             # Verb 4 = Maneuver
             case 4:
                 if len(vessel.control.nodes) == 0:
-                    dsky_send_empty_string()
+                    dsky_send(0,0,0)
                 else:
                     next_node = vessel.control.nodes[0]
                     match noun:
@@ -478,6 +479,125 @@ while handshake_in == "WAITING\n":
 
                     case _:
                         dsky_send(0,0,0)
+
+            # Basic vessel control
+            case 12:
+                match noun:
+                    # SAS Mode = stability assist
+                    case 1:
+                        vessel.control.sas = True
+                        vessel.control.sas_mode = krpc_conn.space_center.SASMode.stability_assist # type: ignore
+
+                    # SAS Mode = maneuver
+                    case 2:
+                        if len(vessel.control.nodes) != 0:
+                            vessel.control.sas = True
+                            vessel.control.sas_mode = krpc_conn.space_center.SASMode.maneuver # type: ignore
+
+                    # SAS Mode = prograde
+                    case 3:
+                        if vessel.situation != krpc_conn.space_center.VesselSituation.pre_launch and vessel.situation != krpc_conn.space_center.VesselSituation.landed and vessel.situation != krpc_conn.space_center.VesselSituation.splashed: # type: ignore
+                            vessel.control.sas = True
+                            vessel.control.sas_mode = krpc_conn.space_center.SASMode.prograde # type: ignore
+
+                    # SAS Mode = retrograde
+                    case 4:
+                        if vessel.situation != krpc_conn.space_center.VesselSituation.pre_launch and vessel.situation != krpc_conn.space_center.VesselSituation.landed and vessel.situation != krpc_conn.space_center.VesselSituation.splashed: # type: ignore
+                            vessel.control.sas = True
+                            vessel.control.sas_mode = krpc_conn.space_center.SASMode.retrograde # type: ignore
+
+                    # SAS Mode = normal
+                    case 5:
+                        vessel.control.sas = True
+                        vessel.control.sas_mode = krpc_conn.space_center.SASMode.normal # type: ignore
+
+                    # SAS Mode = anti normal
+                    case 6:
+                        vessel.control.sas = True
+                        vessel.control.sas_mode = krpc_conn.space_center.SASMode.anti_normal # type: ignore
+
+                    # SAS Mode = radial
+                    case 7:
+                        vessel.control.sas = True
+                        vessel.control.sas_mode = krpc_conn.space_center.SASMode.radial # type: ignore
+
+                    # SAS Mode = anti radial
+                    case 8:
+                        vessel.control.sas = True
+                        vessel.control.sas_mode = krpc_conn.space_center.SASMode.anti_radial # type: ignore
+
+                    # SAS Mode = target
+                    case 9:
+                        if krpc_conn.space_center.target_body != None and krpc_conn.space_center.target_docking_port != None and krpc_conn.space_center.target_vessel != None: # type: ignore
+                            vessel.control.sas = True
+                            vessel.control.sas_mode = krpc_conn.space_center.SASMode.target # type: ignore
+
+                    # SAS Mode = anti target
+                    case 10:
+                        if krpc_conn.space_center.target_body != None and krpc_conn.space_center.target_docking_port != None and krpc_conn.space_center.target_vessel != None: # type: ignore
+                            vessel.control.sas = True
+                            vessel.control.sas_mode = krpc_conn.space_center.SASMode.anti_target # type: ignore
+
+                    # SAS off
+                    case 11:
+                        vessel.control.sas = False
+
+                    # RCS on
+                    case 12:
+                        vessel.control.rcs = True
+
+                    # RCS off
+                    case 13:
+                        vessel.control.rcs = False
+
+                    # Extend gear
+                    case 14:
+                        vessel.control.gear = True
+
+                    # Retract gear
+                    case 15:
+                        vessel.control.gear = False
+
+                    # Lights on
+                    case 16:
+                        vessel.control.lights = True
+
+                    # Lights off
+                    case 17:
+                        vessel.control.lights = False
+
+                    # Brakes on
+                    case 18:
+                        vessel.control.brakes = True
+
+                    # Brakes off
+                    case 19:
+                        vessel.control.brakes = False
+
+                    # Extend solar panels
+                    case 20:
+                        vessel.control.solar_panels = True
+
+                    # Retract solar panels
+                    case 21:
+                        vessel.control.solar_panels = False
+
+                    # Extend antennas
+                    case 22:
+                        vessel.control.antennas = True
+
+                    # Retract antennas
+                    case 23:
+                        vessel.control.antennas = False
+
+                    # Activate next stage
+                    case 24:
+                        vessel.control.activate_next_stage()
+
+                    # Abort
+                    case 25:
+                        vessel.control.abort = True
+
 
             # Testing output
             case 99:

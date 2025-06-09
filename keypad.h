@@ -3,11 +3,11 @@
 
 #define KEY_VERB 10
 #define KEY_NOUN 11
-#define KEY_CLR 12
+#define KEY_CLR 
 #define KEY_MINUS 45
 #define KEY_DOT 46
 #define KEY_ENTER 15
-#define KEY_PROCEED 15
+#define KEY_PROCEED 12
 
 #define KEY_STAT_NO_CHANGE 0
 #define KEY_STAT_PRG_CHANGE 1
@@ -23,7 +23,12 @@
 
 #define INSERTED_NUM_BUF_SIZE 11
 
-extern uint8_t keypad_status, verb, noun;
+#define SAVE_PREV_VERB_NOUN {\
+    prev_verb = verb; \
+    prev_noun = noun; \
+    }
+
+extern uint8_t keypad_status, verb, prev_verb, noun, prev_noun;
 static uint8_t col[4] = {28, 27, 26, 22}, row[4] = {21, 20, 16, 15};
 static uint8_t keymap[4][4] = {{1,  2, 3,  10},     // 1, 2, 3, Verb
                                {4,  5, 6,  11},     // 4, 5, 6, Noun

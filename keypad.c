@@ -13,7 +13,7 @@
 #include "max7219.h"
 #include "led.h"
 
-uint8_t keypad_status = 0, verb = 0, noun = 0, request_num = NO_NUM_TO_READ, change_register;
+uint8_t keypad_status = 0, verb = 0, prev_verb = 0, noun = 0, prev_noun = 0, request_num = NO_NUM_TO_READ, change_register;
 uint8_t verb_choice[] = {254, 254}, noun_choice[] = {254, 254};
 uint8_t dots_count = 0;
 char inserted_num_buf[INSERTED_NUM_BUF_SIZE] = "";
