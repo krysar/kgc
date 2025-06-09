@@ -37,7 +37,7 @@ void keypad_init() {
 int64_t display_program(alarm_id_t id, void *user_data) {
     display_two_digit_number(0, 0, 0, verb);
     display_two_digit_number(0, 0, 1, noun);
-    keypad_status = 0;
+    keypad_status = KEY_STAT_NO_CHANGE;
     return 0;
 }
 
@@ -116,11 +116,12 @@ uint8_t key_evaluate(uint8_t pressed_key) {
         noun_choice[0] = 254;
         noun_choice[1] = 254;
 
-        spi_send_data(0, REG_DIGIT0, CODE_BLANK);
+        /* spi_send_data(0, REG_DIGIT0, CODE_BLANK);
         spi_send_data(0, REG_DIGIT1, CODE_BLANK);
         spi_send_data(0, REG_DIGIT2, CODE_BLANK);
-        spi_send_data(0, REG_DIGIT3, CODE_BLANK);
+        spi_send_data(0, REG_DIGIT3, CODE_BLANK); */
 
+        clear_display(0, 0);
         add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
 
         return KEY_STAT_PRG_CHANGE; // program change
@@ -136,7 +137,7 @@ uint8_t read_number(uint8_t pressed_key) {
     if(strlen(inserted_num_buf) == 0) {
         if(pressed_key <= 9) {
             inserted_num_buf[0] = pressed_key + 0x30;
-            printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
+            // printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
             if(request_num == READ_NUM_DISP_1) {
                 spi_send_data(0, REG_DIGIT4, code_table[pressed_key]);
             } else if(request_num == READ_NUM_DISP_2) {
@@ -146,7 +147,7 @@ uint8_t read_number(uint8_t pressed_key) {
             }
         } else if(pressed_key == '-') {
             inserted_num_buf[0] = pressed_key;
-            printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
+            // printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
             if(request_num == READ_NUM_DISP_1) {
                 spi_send_data(0, REG_DIGIT4, code_table[26]);
             } else if(request_num == READ_NUM_DISP_2) {
@@ -156,7 +157,7 @@ uint8_t read_number(uint8_t pressed_key) {
             }
         } else if(pressed_key == '.') {
             inserted_num_buf[0] = pressed_key;
-            printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
+            // printf("%c, Strlen: %d\n", inserted_num_buf[0], strlen(inserted_num_buf));
             if(request_num == READ_NUM_DISP_1) {
                 spi_send_data(0, REG_DIGIT4, code_table[0] + CODE_DP);
             } else if(request_num == READ_NUM_DISP_2) {
@@ -173,7 +174,7 @@ uint8_t read_number(uint8_t pressed_key) {
             inserted_num_buf[strlen(inserted_num_buf)] = '\0';
             inserted_num[request_num - 1] = strtof(inserted_num_buf, &buf);
 
-            printf("Inserted! String is: %s\n Num is: %f\nChars is: ", inserted_num_buf, inserted_num[request_num - 1]);
+            // printf("Inserted! String is: %s\n Num is: %f\nChars is: ", inserted_num_buf, inserted_num[request_num - 1]);
 
             for(register uint8_t i = 0; i <= strlen(inserted_num_buf); i++) {
                 printf("%02hhX ", inserted_num_buf[i]);
@@ -183,16 +184,16 @@ uint8_t read_number(uint8_t pressed_key) {
             memset(inserted_num_buf, 0, INSERTED_NUM_BUF_SIZE);
 
             gpio_put(LED_OTR, false);
-            request_num = READ_NUM_INSERTED;
+            // request_num = READ_NUM_INSERTED;
             dots_count = 0;
-            return KEY_STAT_NO_CHANGE;
+            return KEY_STAT_NUM_INSERTED;
         } else {
             gpio_put(LED_OTR, true);
         }
     } else {
         if(pressed_key <= 9) {
             inserted_num_buf[strlen(inserted_num_buf)] = pressed_key + 0x30;
-            printf("%c, Strlen: %d\n", inserted_num_buf[strlen(inserted_num_buf) - 1], strlen(inserted_num_buf));
+            // printf("%c, Strlen: %d\n", inserted_num_buf[strlen(inserted_num_buf) - 1], strlen(inserted_num_buf));
             if(strlen(inserted_num_buf) - dots_count < 5) {
                 if(request_num == READ_NUM_DISP_1) {
                     spi_send_data(0, REG_DIGIT4 + strlen(inserted_num_buf) - 1 - dots_count, code_table[pressed_key]);
@@ -206,7 +207,7 @@ uint8_t read_number(uint8_t pressed_key) {
             return KEY_STAT_NUM_INSERTING;
         } else if(pressed_key == '.') {
             inserted_num_buf[strlen(inserted_num_buf)] = pressed_key;
-            printf("%c, Strlen: %d\n", inserted_num_buf[strlen(inserted_num_buf) - 1], strlen(inserted_num_buf));
+            // printf("%c, Strlen: %d\n", inserted_num_buf[strlen(inserted_num_buf) - 1], strlen(inserted_num_buf));
             if(strlen(inserted_num_buf) - dots_count < 5) {
                 char prev_digit = inserted_num_buf[strlen(inserted_num_buf) - 2];
                 if(request_num == READ_NUM_DISP_1) {
@@ -226,18 +227,18 @@ uint8_t read_number(uint8_t pressed_key) {
             inserted_num_buf[strlen(inserted_num_buf)] = '\0';
             inserted_num[request_num - 1] = strtof(inserted_num_buf, &buf);
 
-            printf("Inserted! String is: %s\n Num is: %f\nChars is: ", inserted_num_buf, inserted_num[request_num - 1]);
+            // printf("Inserted! String is: %s\n Num is: %f\nChars is: ", inserted_num_buf, inserted_num[request_num - 1]);
 
-            for(register uint8_t i = 0; i <= strlen(inserted_num_buf); i++) {
+            /* for(register uint8_t i = 0; i <= strlen(inserted_num_buf); i++) {
                 printf("%02hhX ", inserted_num_buf[i]);
-            }
+            } */
 
 
             memset(inserted_num_buf, 0, INSERTED_NUM_BUF_SIZE);
 
-            request_num = READ_NUM_INSERTED;
+            // request_num = READ_NUM_INSERTED;
             dots_count = 0;
-            return KEY_STAT_NO_CHANGE;
+            return KEY_STAT_NUM_INSERTED;
         }
     }
 }
@@ -275,5 +276,33 @@ void keypad_irq_handler(uint gpio, uint32_t events) {
 
         for (register uint8_t i = 0; i < 4; i++)
             gpio_put(row[i], 1); // Set all row pins to 1 to be able to detect a keystroke
+    }
+}
+
+float request_number(uint8_t chip, uint8_t display) {
+    if((chip == 0) && (display == 0)) {
+        // TODO: err
+        return 0;
+    } else {
+        float out_num = 0;
+        display_underscores(chip, display);
+
+        if((chip == 0) && (display == 1)) {
+            request_num = READ_NUM_DISP_1;
+        } else if((chip == 1) && (display == 0)) {
+            request_num = READ_NUM_DISP_2;
+        } else {
+            request_num = READ_NUM_DISP_3;
+        }
+
+        while (keypad_status != KEY_STAT_NUM_INSERTED) {
+            sleep_ms(50);
+        }
+
+        out_num = inserted_num[request_num - 1];
+        request_num = NO_NUM_TO_READ;
+        keypad_status = KEY_STAT_NO_CHANGE;
+
+        return out_num;
     }
 }

@@ -486,7 +486,7 @@ while handshake_in == "WAITING\n":
                         dsky_send(tst, 0, 0)
                         tst += 1
                     case _:
-                        dsky_send_empty_string()
+                        dsky_send(0,0,0)
 
             case _:
                 dsky_send(0,0,0)

@@ -20,6 +20,8 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
+float insnms[3] = {0};
+
 bool timer_uart_send_handler(__unused struct repeating_timer *t);
 void software_reset();
 
@@ -255,107 +257,81 @@ int main() {
 
         // Testing verb
         case 99:
-        switch (noun) {
-            // Display 3 static numbers
-            case 1:
-                display_number(0, 1, 1234);
-                display_number(1, 0, 5678);
-                display_number(1, 1, 9012);
-                break;
-            
-            // Display incrementing number from server
-            case 2:
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
-                while (keypad_status != KEY_STAT_PRG_CHANGE) {
-                    flight_data = uart_data_decoder(uart_str_in);
-                    led_update(flight_data);
-                    display_number(0, 1, flight_data.num1);
-                    display_number(1, 0, flight_data.num2);
-                    display_number(1, 1, flight_data.num3);
-                }
-                break;
-            
-            // Display float
-            case 3:
-                display_float_number(0, 1, 643.52);
-                display_float_number(1, 0, 0.0);
-                display_float_number(1, 1, -0.64352);
-            
-            // Testing number input
-            case 4:
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
-
-                sleep_ms(1000);
-
-                display_underscores(1, 0);
-                request_num = READ_NUM_DISP_2;
+            switch (noun) {
+                // Display 3 static numbers
+                case 1:
+                    display_number(0, 1, 1234);
+                    display_number(1, 0, 5678);
+                    display_number(1, 1, 9012);
+                    break;
                 
-                while(keypad_status != KEY_STAT_PRG_CHANGE) {
-                    sleep_ms(200);
-                    if(request_num == READ_NUM_INSERTED) {
-                        sleep_ms(500);
+                // Display incrementing number from server
+                case 2:
+                    clear_display(0, 1);
+                    clear_display(1, 0);
+                    clear_display(1, 1);
+                    while (keypad_status != KEY_STAT_PRG_CHANGE) {
+                        flight_data = uart_data_decoder(uart_str_in);
+                        led_update(flight_data);
+                        display_number(0, 1, flight_data.num1);
+                        display_number(1, 0, flight_data.num2);
+                        display_number(1, 1, flight_data.num3);
+                    }
+                    break;
+                
+                // Display float
+                case 3:
+                    display_float_number(0, 1, 643.52);
+                    display_float_number(1, 0, 0.0);
+                    display_float_number(1, 1, -0.64352);
+                
+                // Testing number input
+                case 4:
+                    clear_display(0, 1);
+                    clear_display(1, 0);
+                    clear_display(1, 1);
+
+                    float insnum = request_number(1, 0);
+                    
+                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
                         clear_display(0, 1);
                         clear_display(1, 0);
-                        display_float_number(1, 1, inserted_num[1]);
-
-                        printf("ins num: %f\n", inserted_num[1]);
+                        display_float_number(1, 1, insnum);
                     }
+
+                    break;
+
+                case 5:
+                    clear_display(0, 1);
+                    clear_display(1, 0);
+                    clear_display(1, 1);
+
+                    sleep_ms(1000);
+
+                    insnms[0] = request_number(0, 1);
+                    insnms[1] = request_number(1, 0);
+                    insnms[2] = request_number(1, 1);
+
+                    noun = 6;
+                    clear_display(0, 0);
+                    add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+
+                    break;
+
+                case 6:
+                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                        flight_data = uart_data_decoder(uart_str_in);
+                        led_update(flight_data);
+                        display_float_number(0, 1, insnms[0]);
+                        display_float_number(1, 0, insnms[1]);
+                        display_float_number(1, 1, insnms[2]);
+                    }
+
+                    break;
+
+                default:
+                    break;
                 }
-                request_num = NO_NUM_TO_READ;
-
-                break;
-
-            case 5:
-                clear_display(0, 1);
-                clear_display(1, 0);
-                clear_display(1, 1);
-
-                sleep_ms(1000);
-
-                display_underscores(0, 1);
-                request_num = READ_NUM_DISP_1;
-                while (request_num != READ_NUM_INSERTED) {
-                    sleep_ms(50);
-                }
-                
-                display_underscores(1, 0);
-                request_num = READ_NUM_DISP_2;
-                while (request_num != READ_NUM_INSERTED) {
-                    sleep_ms(50);
-                }
-
-                display_underscores(1, 1);
-                request_num = READ_NUM_DISP_3;
-                while (request_num != READ_NUM_INSERTED) {
-                    sleep_ms(50);
-                }
-
-                request_num = NO_NUM_TO_READ;
-                noun = 6;
-
-                break;
-
-            case 6:
-                display_two_digit_number(0, 0, 0, verb);
-                display_two_digit_number(0, 0, 1, noun);
-
-                while(keypad_status != KEY_STAT_PRG_CHANGE) {
-                    flight_data = uart_data_decoder(uart_str_in);
-                    led_update(flight_data);
-                    display_float_number(0, 1, inserted_num[0]);
-                    display_float_number(1, 0, inserted_num[1]);
-                    display_float_number(1, 1, inserted_num[2]);
-                }
-
-                break;
-
-            default:
-                break;
-            }
         default:
             led_update(flight_data);
             clear_display(0, 1);

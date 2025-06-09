@@ -11,9 +11,9 @@
 
 #define KEY_STAT_NO_CHANGE 0
 #define KEY_STAT_PRG_CHANGE 1
-#define KEY_STAT_PROCEED 3
-#define KEY_STAT_NUM_INSERTING 4
-#define KEY_STAT_NUM_INSERTED 5
+#define KEY_STAT_PROCEED 2
+#define KEY_STAT_NUM_INSERTING 3
+#define KEY_STAT_NUM_INSERTED 4
 
 #define NO_NUM_TO_READ 0
 #define READ_NUM_DISP_1 1
@@ -23,11 +23,7 @@
 
 #define INSERTED_NUM_BUF_SIZE 11
 
-extern uint8_t keypad_status, verb, noun, request_num;
-extern char inserted_num_buf[INSERTED_NUM_BUF_SIZE];
-extern float inserted_num[3];
-extern bool debounce;
-extern uint8_t verb_choice[], noun_choice[];
+extern uint8_t keypad_status, verb, noun;
 static uint8_t col[4] = {28, 27, 26, 22}, row[4] = {21, 20, 16, 15};
 static uint8_t keymap[4][4] = {{1,  2, 3,  10},     // 1, 2, 3, Verb
                                {4,  5, 6,  11},     // 4, 5, 6, Noun
@@ -39,6 +35,7 @@ int64_t debounce_unset(alarm_id_t id, void *user_data);
 int64_t display_program(alarm_id_t id, void *user_data);
 uint8_t key_evaluate(uint8_t pressed_key);
 uint8_t read_number(uint8_t pressed_key);
+float request_number(uint8_t chip, uint8_t display);
 
 void keypad_irq_handler(uint gpio, uint32_t events);
 
