@@ -14,6 +14,7 @@
 
 char uart_str_in[UART_STR_IN_BUF_SIZE] = "";
 uint8_t time_since_last_connection = 0;
+float send_data[3] = {0};
 
 void conn_init() {
     uart_init(UART_ID, UART_BAUD_RATE);

@@ -26,6 +26,8 @@ extern char uart_str_in[UART_STR_IN_BUF_SIZE];
 // Reseted every time when uart_irq_handler() is triggered.
 extern uint8_t time_since_last_connection;
 
+extern float send_data[3];
+
 typedef struct ksp_data {
     int64_t num1;
     int64_t num2;

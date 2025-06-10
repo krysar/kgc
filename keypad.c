@@ -47,6 +47,10 @@ int64_t debounce_unset(alarm_id_t id, void *user_data) {
 }
 
 uint8_t key_evaluate(uint8_t pressed_key) {
+    if(pressed_key == KEY_PROCEED) {
+        printf("Proceed\n");
+        return KEY_STAT_PROCEED;
+    }
     // KEY_VERB is pressed without any previous verb operation
     // Preparation for insert 1st verb digit
     if ((pressed_key == KEY_VERB) && (verb_choice[0] == 254) && (verb_choice[1] == 254)) {

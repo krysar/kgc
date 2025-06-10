@@ -16,11 +16,136 @@
 #include "keypad.h"
 #include "connection.h"
 #include "led.h"
+#include "errors.h"
+
+#define ASC_INS_3_NUMS(prev, next) {\
+    if((prev_verb == 13) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+\
+        clear_display(0, 1); \
+        clear_display(1, 0); \
+        clear_display(1, 1); \
+\
+        sleep_ms(500); \
+\
+        insnms[0] = request_number(0, 1); \
+        insnms[1] = request_number(1, 0); \
+        insnms[2] = request_number(1, 1); \
+\
+        sleep_ms(100); \
+\
+        send_data[0] = insnms[0]; \
+        send_data[1] = insnms[1]; \
+        send_data[2] = insnms[2]; \
+\
+        sleep_ms(1500); \
+\
+        noun = next; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_ASC_UNINITIALIZED); \
+        } \
+    } \
+}
+
+#define ASC_INS_2_NUMS(prev, next) {\
+    if((prev_verb == 13) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+\
+        clear_display(0, 1); \
+        clear_display(1, 0); \
+        clear_display(1, 1); \
+\
+        sleep_ms(500); \
+\
+        insnms[0] = request_number(0, 1); \
+        insnms[1] = request_number(1, 0); \
+\
+        sleep_ms(100); \
+\
+        send_data[0] = insnms[0]; \
+        send_data[1] = insnms[1]; \
+        send_data[2] = 0; \
+\
+        sleep_ms(1500); \
+\
+        noun = next; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_ASC_UNINITIALIZED); \
+        } \
+    } \
+}
+
+#define ASC_DISP_2_NUMS(prev, next) {\
+    if((prev_verb == 13) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+        keypad_status = KEY_STAT_NO_CHANGE;\
+        while(keypad_status != KEY_STAT_PROCEED) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            display_number(0, 1, flight_data.num1); \
+            display_number(1, 0, flight_data.num2); \
+            clear_display(1, 1); \
+        } \
+\
+        noun = next; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_ASC_UNINITIALIZED); \
+        } \
+    } \
+}
+
+#define ASC_DISP_3_NUMS(prev, next) {\
+    if((prev_verb == 13) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+        keypad_status = KEY_STAT_NO_CHANGE;\
+        while(keypad_status != KEY_STAT_PROCEED) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            display_number(0, 1, flight_data.num1); \
+            display_number(1, 0, flight_data.num2); \
+            display_number(1, 1, flight_data.num3); \
+        } \
+\
+        noun = next; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_ASC_UNINITIALIZED); \
+        } \
+    } \
+}
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
 float insnms[3] = {0};
+uint8_t asc_profile = 4;
 
 bool timer_uart_send_handler(__unused struct repeating_timer *t);
 void software_reset();
@@ -278,6 +403,258 @@ int main() {
 
             break;
 
+        // Ascent autopilot
+        case 13:
+            switch(noun) {
+                // Init ascent autopilot
+                case 0:
+                    sleep_ms(1000);
+                    SAVE_PREV_VERB_NOUN
+                    noun = 1;
+                    clear_display(0, 0);
+                    add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                    sleep_ms(900);
+                    break;
+
+                // Insert orbit altitude, inclination, ascent profile
+                case 1:
+                    if((prev_verb == 13) && (prev_noun == 0)) {
+                        SAVE_PREV_VERB_NOUN
+
+                        clear_display(0, 1);
+                        clear_display(1, 0);
+                        clear_display(1, 1);
+
+                        sleep_ms(500);
+
+                        insnms[0] = request_number(0, 1);
+                        insnms[1] = request_number(1, 0);
+                        insnms[2] = request_number(1, 1);
+
+                        sleep_ms(100);
+
+                        send_data[0] = insnms[0];
+                        send_data[1] = insnms[1];
+                        send_data[2] = insnms[2];
+                        asc_profile = (uint8_t)insnms[2];
+
+                        sleep_ms(1500);
+
+                        noun = 2;
+                        clear_display(0, 0);
+                        add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                        sleep_ms(900);
+                    } else {
+                        while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                            clear_display(0, 1);
+                            display_err_code(ERR_ASC_UNINITIALIZED);
+                        }
+                    }
+                    break;
+
+                // Display orbit altitude, inclination, ascent profile for confirmation
+                case 2:
+                    ASC_DISP_3_NUMS(1, 3)
+                    break;
+
+                // Insert Q limit, acceleration limit, throttle limit
+                case 3:
+                    ASC_INS_3_NUMS(2, 4)
+                    break;
+
+                // Display Q limit, acceleration limit, throttle limit for confirmation
+                case 4:
+                    ASC_DISP_3_NUMS(3, 5)
+                    break;
+
+                // Insert force roll: climb, turn, alt
+                case 5:
+                    ASC_INS_3_NUMS(4, 6)
+                    break;
+
+                // Display force roll: climb, turn, alt for confirmation
+                case 6:
+                    ASC_DISP_3_NUMS(5, 7)
+                    break;
+
+                // Insert autostage: pre-delay, post-delay, clamp autostage thurst
+                case 7:
+                    ASC_INS_3_NUMS(6, 8)
+                    break;
+
+                // Display autostage: pre-delay, post-delay, clamp autostage thurst for confirmation
+                case 8:
+                    ASC_DISP_3_NUMS(7, 9)
+                    break;
+
+                // Insert min throttle, stop stage for autostage, other options
+                case 9:
+                    ASC_INS_3_NUMS(8, 10)
+                    break;
+
+                // Display min throttle, stop stage for auto stage, other options for confirmation
+                case 10:
+                    if((prev_verb == 13) && (prev_noun == 9)) {
+                        SAVE_PREV_VERB_NOUN
+                        while(keypad_status != KEY_STAT_PROCEED){
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                            display_number(0, 1, flight_data.num1);
+                            display_number(1, 0, flight_data.num2);
+                            display_number(1, 1, flight_data.num3);
+                        }
+
+                        switch(asc_profile) {
+                            case 1:
+                                noun = 11;
+                                break;
+                            case 2:
+                                noun = 15;
+                                break;
+                            case 3:
+                                noun = 19;
+                                break;
+                            default:
+                                while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                                    flight_data = uart_data_decoder(uart_str_in);
+                                    led_update(flight_data);
+                                    clear_display(0, 1);
+                                    display_err_code(ERR_ASC_BAD_ASC_PROFILE);
+                                }
+                        }
+
+                        clear_display(0, 0);
+                        add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                        sleep_ms(900);
+                    } else {
+                        while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                            clear_display(0, 1);
+                            display_err_code(ERR_ASC_UNINITIALIZED);
+                        }
+                    }
+                    break;
+
+                // Classic ascent profile
+                // Insert turn start altitude, turn start velocity, turn end altitude
+                case 11:
+                    ASC_INS_3_NUMS(10, 12)
+                    break;
+
+                // Display turn start altitude, turn start velocity, turn end altitude for confirmation
+                case 12:
+                    ASC_DISP_3_NUMS(11, 13)
+                    break;
+
+                // Insert final flight path angle, turn shape
+                case 13:
+                    ASC_INS_2_NUMS(12, 14)
+                    break;
+
+                // Display final flight path angle, turn shape for confirmation
+                case 14:
+                    ASC_DISP_2_NUMS(13, 25)
+                    break;
+                
+                // Stock style gravity turn
+                // Insert turn start altitude, turn start velocity, turn start pitch
+                case 15:
+                    ASC_INS_3_NUMS(10, 16)
+                    break;
+
+                // Display turn start altitude, turn start velocity, turn start pitch
+                case 16:
+                    ASC_DISP_3_NUMS(15, 17)
+                    break;
+
+                // Insert intermediate altitude, hold AP time
+                case 17:
+                    ASC_INS_2_NUMS(16, 18)
+                    break;
+
+                // Display intermediate altitude, hold AP time for confirmation
+                case 18:
+                    ASC_DISP_2_NUMS(17, 25)
+                    break;
+
+                // PVG ascent profile
+                // Insert target apoapsis, attach altitude, booster pitch start
+                case 19:
+                    ASC_INS_3_NUMS(10, 20)
+                    break;
+
+                // Display target apoapsis, attach altitude, booster pitch start for confirmation
+                case 20:
+                    ASC_DISP_3_NUMS(19, 21)
+                    break;
+
+                // Insert booster pitch rate, PVG after stage, guidance interval
+                case 21:
+                    ASC_INS_3_NUMS(20, 22)
+                    break;
+
+                // Display booster pitch rate, PVG after stage, guidance interval for confirmation
+                case 22:
+                    ASC_DISP_3_NUMS(21, 23)
+                    break;
+
+                // Insert Q-alpha limit, fixed coast length
+                case 23:
+                    ASC_INS_2_NUMS(22, 24)
+                    break;
+                
+                // Display Q-alpha limit, fixed coast length for confirmation
+                case 24:
+                    ASC_DISP_2_NUMS(23, 25)
+                    break;
+
+                // Enable ascent autopilot
+                case 25:
+                    if((prev_verb == 13) && ((prev_noun == 14) || (prev_noun == 18) || (prev_noun == 24))) {
+                        clear_display(0, 1);
+                        clear_display(1, 0);
+                        clear_display(1, 1);
+
+                        send_data[0] = 0;
+                        send_data[1] = 0;
+                        send_data[2] = 0;
+
+                        while(keypad_status != KEY_STAT_PROCEED) {
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                        }
+
+                        send_data[0] = 1;
+                        sleep_ms(1500);
+
+                        verb = 3;
+                        noun = 1;
+
+                        clear_display(0, 0);
+                        add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                        sleep_ms(900);
+                    } else {
+                        while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                            clear_display(0, 1);
+                            display_err_code(ERR_ASC_UNINITIALIZED);
+                        }
+                    }
+                    break;
+
+                default:
+                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                        flight_data = uart_data_decoder(uart_str_in);
+                        led_update(flight_data);
+                        display_err_code(ERR_ASC_NON_EXIST_NOUN);
+                    }
+            }
+            break;
+
         // Testing verb
         case 99:
             switch (noun) {
@@ -338,7 +715,7 @@ int main() {
                     clear_display(1, 0);
                     clear_display(1, 1);
 
-                    sleep_ms(1000);
+                    sleep_ms(500);
 
                     insnms[0] = request_number(0, 1);
                     insnms[1] = request_number(1, 0);
@@ -351,14 +728,19 @@ int main() {
                     break;
 
                 case 6:
-                    while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                    while(keypad_status != KEY_STAT_PROCEED) {
                         flight_data = uart_data_decoder(uart_str_in);
                         led_update(flight_data);
                         display_float_number(0, 1, insnms[0]);
                         display_float_number(1, 0, insnms[1]);
                         display_float_number(1, 1, insnms[2]);
                     }
-
+                    
+                    verb = prev_verb;
+                    noun = prev_noun;
+                    clear_display(0, 0);
+                    add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                    
                     break;
 
                 default:
@@ -375,9 +757,9 @@ int main() {
 }
 
 bool timer_uart_send_handler(__unused struct repeating_timer *t) {
-    char buffer[50];
+    char buffer[128];
     // printf("Verb: %u Noun: %u\n", verb, noun);
-    sprintf(buffer, "V:%u;N:%u\n", verb, noun);
+    sprintf(buffer, "V:%u;N:%u;D1:%f;D2:%f;D3:%f\n", verb, noun, send_data[0], send_data[1], send_data[2]);
     uart_puts(UART_ID, buffer);
 
     return true;
