@@ -41,6 +41,9 @@
         sleep_ms(1500); \
 \
         noun = next; \
+        send_data[0] = -2; \
+        send_data[1] = -2; \
+        send_data[2] = -2; \
         clear_display(0, 0); \
         add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
         sleep_ms(900); \
@@ -76,6 +79,9 @@
         sleep_ms(1500); \
 \
         noun = next; \
+        send_data[0] = -2; \
+        send_data[1] = -2; \
+        send_data[2] = -2; \
         clear_display(0, 0); \
         add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
         sleep_ms(900); \
@@ -410,6 +416,9 @@ int main() {
                 case 0:
                     sleep_ms(1000);
                     SAVE_PREV_VERB_NOUN
+                    send_data[0] = -2; 
+                    send_data[1] = -1000; 
+                    send_data[2] = -2; 
                     noun = 1;
                     clear_display(0, 0);
                     add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
@@ -441,6 +450,9 @@ int main() {
                         sleep_ms(1500);
 
                         noun = 2;
+                        send_data[0] = -2; 
+                        send_data[1] = -2; 
+                        send_data[2] = -2; 
                         clear_display(0, 0);
                         add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
                         sleep_ms(900);
@@ -459,24 +471,24 @@ int main() {
                     ASC_DISP_3_NUMS(1, 3)
                     break;
 
-                // Insert Q limit, acceleration limit, throttle limit
+                // Insert acceleration limit, throttle limit
                 case 3:
-                    ASC_INS_3_NUMS(2, 4)
+                    ASC_INS_2_NUMS(2, 4)
                     break;
 
-                // Display Q limit, acceleration limit, throttle limit for confirmation
+                // Display acceleration limit, throttle limit for confirmation
                 case 4:
-                    ASC_DISP_3_NUMS(3, 5)
+                    ASC_DISP_2_NUMS(3, 5)
                     break;
 
-                // Insert force roll: climb, turn, alt
+                // Insert force roll: climb, turn
                 case 5:
-                    ASC_INS_3_NUMS(4, 6)
+                    ASC_INS_2_NUMS(4, 6)
                     break;
 
-                // Display force roll: climb, turn, alt for confirmation
+                // Display force roll: climb, turn for confirmation
                 case 6:
-                    ASC_DISP_3_NUMS(5, 7)
+                    ASC_DISP_2_NUMS(5, 7)
                     break;
 
                 // Insert autostage: pre-delay, post-delay, clamp autostage thurst
@@ -591,22 +603,22 @@ int main() {
                     ASC_DISP_3_NUMS(19, 21)
                     break;
 
-                // Insert booster pitch rate, PVG after stage, guidance interval
+                // Insert booster pitch rate, PVG after stage
                 case 21:
-                    ASC_INS_3_NUMS(20, 22)
+                    ASC_INS_2_NUMS(20, 22)
                     break;
 
-                // Display booster pitch rate, PVG after stage, guidance interval for confirmation
+                // Display booster pitch rate, PVG after stage for confirmation
                 case 22:
-                    ASC_DISP_3_NUMS(21, 23)
+                    ASC_DISP_2_NUMS(21, 23)
                     break;
 
-                // Insert Q-alpha limit, fixed coast length
+                // Insert Q trigger, fixed coast length
                 case 23:
                     ASC_INS_2_NUMS(22, 24)
                     break;
                 
-                // Display Q-alpha limit, fixed coast length for confirmation
+                // Display Q trigger, fixed coast length for confirmation
                 case 24:
                     ASC_DISP_2_NUMS(23, 25)
                     break;
@@ -618,9 +630,9 @@ int main() {
                         clear_display(1, 0);
                         clear_display(1, 1);
 
-                        send_data[0] = 0;
-                        send_data[1] = 0;
-                        send_data[2] = 0;
+                        send_data[0] = -2;
+                        send_data[1] = -2;
+                        send_data[2] = -2;
 
                         while(keypad_status != KEY_STAT_PROCEED) {
                             flight_data = uart_data_decoder(uart_str_in);
@@ -645,6 +657,27 @@ int main() {
                         }
                     }
                     break;
+
+                // Disable ascent autopilot
+                case 26:
+                    send_data[0] = -2;
+                    send_data[1] = -2;
+                    send_data[2] = -2;
+
+                    while(keypad_status != KEY_STAT_PROCEED) {
+                        flight_data = uart_data_decoder(uart_str_in);
+                        led_update(flight_data);
+                    }
+
+                    send_data[0] = 1;
+                    sleep_ms(1500);
+
+                    verb = prev_noun;
+                    noun = prev_verb;
+
+                    clear_display(0, 0);
+                    add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                    sleep_ms(900);
 
                 default:
                     while(keypad_status != KEY_STAT_PRG_CHANGE) {

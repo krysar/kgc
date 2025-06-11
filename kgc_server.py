@@ -159,9 +159,32 @@ def dsky_send_empty_string():
     ser_out = ser_out.encode("utf-8", "strict")
     ser_conn.write(ser_out)
 
+# It's not effective, I just copied and edited function from max7219.c (:
+def dec2bin(dec: int) -> list[bool]:
+    bin = 0; rem = 0; i = 1
+
+    while dec != 0:
+        rem = dec % 2
+        dec = dec >> 1
+        bin += rem * i
+        i *= 10
+
+    l_bin = [0, 0, 0, 0]
+
+    for i in range(4, 0, -1):
+        l_bin[i - 1] = bin % 10
+        bin = bin // 10
+
+    l_bool = []
+
+    for i in l_bin:
+        l_bool.append(bool(i))
+
+    return l_bool
+
 # Main program:
 
-print("KGC 0.3.2")
+print("KGC 0.4.0")
 
 serial_port = input("Serial port? ")
 ser_conn = serial.Serial(serial_port, 115200)
@@ -170,13 +193,14 @@ ser_conn.stopbits = serial.STOPBITS_ONE
 ser_conn.parity = serial.PARITY_EVEN
 ser_conn.timeout = None
 
-krpc_conn = krpc.connect(name='KGC 0.3.2')
+krpc_conn = krpc.connect(name='KGC 0.4.0')
 if ser_conn.is_open == False:
     ser_conn.open()
 
 tst = 1024
 verb = 0
 noun = 0
+dsky_data_in = [0.0, 0.0, 0.0]
 
 # Waiting for handshake
 print("Connecting to kgc...", end=" ")
@@ -204,6 +228,18 @@ while handshake_in == "WAITING\n":
             noun = i.split(':')
             noun = noun[1].strip()
             noun = int(noun)
+        elif i.startswith("D1:"):
+            buf = i.split(':')
+            buf = buf[1].strip()
+            dsky_data_in[0] = float(buf)
+        elif i.startswith("D2:"):
+            buf = i.split(':')
+            buf = buf[1].strip()
+            dsky_data_in[1] = float(buf)
+        elif i.startswith("D3:"):
+            buf = i.split(':')
+            buf = buf[1].strip()
+            dsky_data_in[2] = float(buf)
         # print("Verb is ", verb, ", noun is ", noun)
 
     if str(krpc_conn.krpc.current_game_scene) == "GameScene.flight": # type: ignore
@@ -423,7 +459,7 @@ while handshake_in == "WAITING\n":
                     # Noun 2 = Mean altitude + apoapsis + inclination
                     case 2:
                         inc = int((vessel.orbit.inclination * 180 / math.pi) * 1000) # Convert radians to degrees
-                        dsky_send(int(vessel.flight().mean_altitude), int(vessel.orbit.apoapsis), inc)
+                        dsky_send(int(vessel.flight().mean_altitude), int(vessel.orbit.apoapsis_altitude), inc)
 
                     # Noun 3 = Apoapsis + periapsis + inclination
                     case 3:
@@ -598,6 +634,259 @@ while handshake_in == "WAITING\n":
                     case 25:
                         vessel.control.abort = True
 
+            # Ascent guidance
+            case 13:
+                mechjeb = krpc_conn.mech_jeb # type: ignore
+                ascent_guidance = mechjeb.ascent_autopilot
+                otr_opts_dec = 0
+                match noun:
+                    # Insert orbit altitude, inclination, ascent profile {1, 2, 3}
+                    case 1:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.desired_orbit_altitude = dsky_data_in[0] * 1000
+                        if dsky_data_in[1] > -1000:
+                            ascent_guidance.desired_inclination = dsky_data_in[1]
+                        if dsky_data_in[2] > -2:
+                            ascent_guidance.ascent_path_index = int(dsky_data_in[2] - 1)
+
+                    # Display orbit altitude, inclination, ascent profile {1, 2, 3}
+                    case 2:
+                        dsky_send(int(ascent_guidance.desired_orbit_altitude / 1000), int(ascent_guidance.desired_inclination), ascent_guidance.ascent_path_index + 1)
+
+                    # Insert acceleration limit, throttle limit
+                    case 3:
+                        if dsky_data_in[0] == -1:
+                            ascent_guidance.thrust_controller.limit_acceleration = False
+                        elif dsky_data_in[0] >= 0:
+                            ascent_guidance.thrust_controller.limit_acceleration = True
+                            ascent_guidance.thrust_controller.max_acceleration = dsky_data_in[0]
+
+                        if dsky_data_in[1] == -1:
+                            ascent_guidance.thrust_controller.limit_throttle = False
+                        elif dsky_data_in[1] >= 0:
+                            ascent_guidance.thrust_controller.limit_throttle = True
+                            ascent_guidance.thrust_controller.max_throttle = dsky_data_in[1] / 100
+
+                    # Display acceleration limit, throttle limit
+                    case 4:
+                        if ascent_guidance.thrust_controller.limit_acceleration == False:
+                            max_acc = -1
+                        else:
+                            max_acc = int(ascent_guidance.thrust_controller.max_acceleration)
+
+                        if ascent_guidance.thrust_controller.limit_throttle == False:
+                            max_thr = -1
+                        else:
+                            max_thr = int(ascent_guidance.thrust_controller.max_throttle * 100)
+
+                        dsky_send(max_acc, max_thr, 0)
+
+                    # Insert force roll climb, turn
+                    case 5:
+                        if dsky_data_in[0] == -1:
+                            ascent_guidance.force_roll = False
+                        elif dsky_data_in[0] >= 0:
+                            ascent_guidance.force_roll = True
+                            ascent_guidance.turn_roll = dsky_data_in[0]
+                            ascent_guidance.vertical_roll = dsky_data_in[1]
+
+                    # Display force roll climb, turn
+                    case 6:
+                        if ascent_guidance.force_roll == False:
+                            t_roll = -1
+                            v_roll = -1
+                        else:
+                            t_roll = int(ascent_guidance.turn_roll)
+                            v_roll = int(ascent_guidance.vertical_roll)
+
+                        dsky_send(t_roll, v_roll, 0)
+
+                    # Insert autostage pre-delay, post-delay, clamp autostage thurst
+                    case 7:
+                        if dsky_data_in[0] == -1:
+                            ascent_guidance.staging_controller.enabled = False
+                        elif dsky_data_in[0] >= 0:
+                            ascent_guidance.staging_controller.enabled = True
+                            ascent_guidance.staging_controller.autostage_pre_delay = dsky_data_in[0]
+                            ascent_guidance.staging_controller.autostage_post_delay = dsky_data_in[1]
+                            ascent_guidance.staging_controller.clamp_auto_stage_thrust_pct = dsky_data_in[2]
+
+                    # Display autostage pre-delay, post-delay, clamp autostage thurst
+                    case 8:
+                        if ascent_guidance.staging_controller.enabled == False:
+                            pre_delay = -1
+                            post_delay = -1
+                            clamp_stg = -1
+                        else:
+                            pre_delay = int(ascent_guidance.staging_controller.autostage_pre_delay)
+                            post_delay = int(ascent_guidance.staging_controller.autostage_post_delay)
+                            clamp_stg = ascent_guidance.staging_controller.clamp_auto_stage_thrust_pct
+
+                        dsky_send(pre_delay, post_delay, clamp_stg)
+
+                    # Insert min. throttle, stop stage, other options
+                    case 9:
+                        if dsky_data_in[0] == -1:
+                            ascent_guidance.thrust_controller.limiter_min_throttle = False
+                        elif dsky_data_in[0] >= 0:
+                            ascent_guidance.thrust_controller.limiter_min_throttle = True
+                            ascent_guidance.thrust_controller.min_throttle = dsky_data_in[0] / 100
+
+                        if ascent_guidance.staging_controller.enabled == True and dsky_data_in[1] > -2:
+                            ascent_guidance.staging_controller.autostage_limit = int(dsky_data_in[1])
+
+                        if dsky_data_in[2] >= 0 and dsky_data_in[2] <= 15:
+                            otr_opts_dec = int(dsky_data_in[2])
+                            otr_opts = dec2bin(otr_opts_dec)
+                            ascent_guidance.thrust_controller.limit_to_prevent_overheats = otr_opts[0]
+                            ascent_guidance.autodeploy_solar_panels = otr_opts[1]
+                            ascent_guidance.auto_deploy_antennas = otr_opts[2]
+                            ascent_guidance.skip_circularization = otr_opts[3]
+
+                    # Display min. throttle, stop stage, other options
+                    case 10:
+                        if ascent_guidance.thrust_controller.limiter_min_throttle == False:
+                            min_thr = -1
+                        else:
+                            min_thr = int(ascent_guidance.thrust_controller.min_throttle * 100)
+
+                        if ascent_guidance.staging_controller.enabled == False:
+                            as_limit = -1
+                        else:
+                            as_limit = ascent_guidance.staging_controller.autostage_limit
+
+                        dsky_send(min_thr, as_limit, otr_opts_dec)
+
+                    # Classic ascent profile
+                    # Insert turn start altitude, turn start velocity, turn end altitude
+                    case 11:
+                        if dsky_data_in[0] == -1:
+                            ascent_guidance.ascent_path_classic.auto_path = True
+                        elif dsky_data_in[0] >= 0:
+                            ascent_guidance.ascent_path_classic.auto_path = False
+                            ascent_guidance.ascent_path_classic.turn_start_altitude = dsky_data_in[0] * 1000
+                            ascent_guidance.ascent_path_classic.turn_start_velocity = dsky_data_in[1]
+                            ascent_guidance.ascent_path_classic.turn_end_altitude = dsky_data_in[2] * 1000
+
+                    # Display turn start altitude, turn start velocity, turn end altitude
+                    case 12:
+                        if ascent_guidance.ascent_path_classic.auto_path == True:
+                            turn_start = int(ascent_guidance.ascent_path_classic.auto_turn_start_altitude / 1000)
+                            velo_start = int(ascent_guidance.ascent_path_classic.auto_turn_start_velocity)
+                            turn_end = int(ascent_guidance.ascent_path_classic.auto_turn_end_altitude)
+                        else:
+                            turn_start = int(ascent_guidance.ascent_path_classic.turn_start_altitude / 1000)
+                            velo_start = int(ascent_guidance.ascent_path_classic.turn_start_velocity)
+                            turn_end = int(ascent_guidance.ascent_path_classic.turn_end_altitude / 1000)
+
+                        dsky_send(turn_start, velo_start, turn_end)
+
+                    # Insert final flight path angle, turn shape
+                    case 13:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.ascent_path_classic.turn_end_angle = dsky_data_in[0]
+                        if dsky_data_in[1] > -2:
+                            ascent_guidance.ascent_path_classic.turn_shape_exponent = dsky_data_in[1] / 100
+
+                    # Display final flight path angle, turn shape
+                    case 14:
+                        dsky_send(int(ascent_guidance.ascent_path_classic.turn_end_angle), int(ascent_guidance.ascent_path_classic.turn_shape_exponent * 100), 0)
+
+                    # Stock style gravity turn ascent profile
+                    # Insert turn start altitude, turn start velocity, turn start pitch
+                    case 15:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.ascent_path_gt.turn_start_altitude = dsky_data_in[0] * 1000
+                        if dsky_data_in[1] > -2:
+                            ascent_guidance.ascent_path_gt.turn_start_velocity = dsky_data_in[1]
+                        if dsky_data_in[2] > -2:
+                            ascent_guidance.ascent_path_gt.turn_start_pitch = dsky_data_in[2]
+
+                    # Display turn start altitude, turn start velocity, turn start pitch
+                    case 16:
+                        dsky_send(int(ascent_guidance.ascent_path_gt.turn_start_altitude / 1000), int(ascent_guidance.ascent_path_gt.turn_start_velocity), int(ascent_guidance.ascent_path_gt.turn_start_pitch))
+
+                    # Insert intermediate altitude, hold AP time
+                    case 17:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.ascent_path_gt.intermediate_altitude = dsky_data_in[0] * 1000
+                        if dsky_data_in[1] > -2:
+                            ascent_guidance.ascent_path_gt.hold_ap_time = dsky_data_in[1]
+
+                    # Display intermediate altitude, hold AP time
+                    case 18:
+                        dsky_send(int(ascent_guidance.ascent_path_gt.intermediate_altitude / 1000), int(ascent_guidance.ascent_path_gt.hold_ap_time), 0)
+
+                    # PVG ascent profile
+                    # Insert target apoapsis, attach altitude, booster pitch start
+                    case 19:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.ascent_path_pvg.desired_apoapsis = dsky_data_in[0] * 1000
+                        if dsky_data_in[1] > -2:
+                            ascent_guidance.ascent_path_pvg.desired_attach_alt = dsky_data_in[1] * 1000
+                        if dsky_data_in[2] > -2:
+                            ascent_guidance.ascent_path_pvg.pitch_start_velocity = dsky_data_in[2]
+
+                    # Display target apoapsis, attach altitude, booster pitch start
+                    case 20:
+                        dsky_send(int(ascent_guidance.ascent_path_pvg.desired_attach_alt / 1000), int(ascent_guidance.ascent_path_pvg.desired_attach_alt / 1000), int(ascent_guidance.ascent_path_pvg.pitch_start_velocity))
+
+                    # Insert booster pitch rate, PVG after stage
+                    case 21:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.ascent_path_pvg.ascent_path_pvg.pitch_rate = dsky_data_in[0]
+
+                        if(dsky_data_in[1] == -1):
+                            ascent_guidance.ascent_path_pvg.staging_trigger_flag = False
+                        elif(dsky_data_in[1] >= 0):
+                            ascent_guidance.ascent_path_pvg.staging_trigger_flag = True
+                            ascent_guidance.ascent_path_pvg.staging_trigger = int(dsky_data_in[1])
+
+                        ascent_guidance.ascent_path_pvg.dynamic_pressure_trigger = dsky_data_in[2]
+
+                    # Display booster pitch rate, PVG after stage, 
+                    case 22:
+                        if ascent_guidance.ascent_path_pvg.staging_trigger_flag == False:
+                            stag_trig = -1
+                        else:
+                            stag_trig = ascent_guidance.ascent_path_pvg.staging_trigger
+
+                        dsky_send(int(ascent_guidance.ascent_path_pvg.ascent_path_pvg.pitch_rate), stag_trig, 0)
+
+                    # Insert Q trigger, fixed coast length
+                    case 23:
+                        if dsky_data_in[0] > -2:
+                            ascent_guidance.ascent_path_pvg.dynamic_pressure_trigger = dsky_data_in[0]
+
+                        if dsky_data_in[1] == -1:
+                            ascent_guidance.ascent_path_pvg.fixed_coast = False
+                        elif dsky_data_in[1] >= 0:
+                            ascent_guidance.ascent_path_pvg.fixed_coast = True
+                            ascent_guidance.ascent_path_pvg.fixed_coast_length = dsky_data_in[1]
+
+                    # Display Q trigger, fixed coast length
+                    case 24:
+                        if ascent_guidance.ascent_path_pvg.fixed_coast == False:
+                            fix_coast = -1
+                        else:
+                            fix_coast = int(ascent_guidance.ascent_path_pvg.fixed_coast_length)
+
+                        dsky_send(int(ascent_guidance.ascent_path_pvg.dynamic_pressure_trigger), fix_coast , 0)
+
+                    # Enage autopilot
+                    case 25:
+                        if(dsky_data_in[0] == 1):
+                            ascent_guidance.enabled = True
+                            if vessel.situation == krpc_conn.space_center.VesselSituation.pre_launch: # type: ignore
+                                vessel.control.activate_next_stage()
+
+                    # Disenage autopilot
+                    case 26:
+                        if(dsky_data_in[0] == 1):
+                            ascent_guidance.enabled = False
+
+                    case _:
+                        dsky_send(0,0,0)
 
             # Testing output
             case 99:
