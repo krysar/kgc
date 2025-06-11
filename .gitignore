@@ -269,7 +269,8 @@ fp-info-cache
 
 # Exported BOM files
 *.xml
-*.csv
+kicad/*.csv
+kicad/*/*.csv
 
 ### KiCad Patch ###
 rescue-backup/
