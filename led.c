@@ -6,8 +6,10 @@
 #include "pico/stdlib.h"
 
 #include "led.h"
+#include "keypad.h"
+#include "max7219.h"
 
-bool led_stat[11] = {0};
+bool led_stat[12] = {0};
 bool blink_stat = 0;
 struct repeating_timer led_blink_tmr;
 
@@ -115,6 +117,14 @@ bool led_blinker(__unused struct repeating_timer *t) {
         (blink_stat) ? gpio_put(LED_BRK, false) : gpio_put(LED_BRK, true);
     if(led_stat[LED_STAT_BUZZ])
         (blink_stat) ? gpio_put(BUZZ, false) : gpio_put(BUZZ, true);
+    if(led_stat[LED_STAT_DISP1]) {
+        if(blink_stat) {
+            clear_display(0, 0);
+        } else {
+            display_two_digit_number(0, 0, 0, verb);
+            display_two_digit_number(0, 0, 1, noun);
+        }
+    }
 
     blink_stat = !blink_stat;
     if(time_since_last_connection < 5)

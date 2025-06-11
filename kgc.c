@@ -98,6 +98,7 @@
 #define ASC_DISP_2_NUMS(prev, next) {\
     if((prev_verb == 13) && (prev_noun == prev)) { \
         SAVE_PREV_VERB_NOUN \
+        led_stat[LED_STAT_DISP1] = true;\
         keypad_status = KEY_STAT_NO_CHANGE;\
         while(keypad_status != KEY_STAT_PROCEED) { \
             flight_data = uart_data_decoder(uart_str_in); \
@@ -107,6 +108,7 @@
             clear_display(1, 1); \
         } \
 \
+        led_stat[LED_STAT_DISP1] = false;\
         noun = next; \
         clear_display(0, 0); \
         add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
@@ -124,6 +126,7 @@
 #define ASC_DISP_3_NUMS(prev, next) {\
     if((prev_verb == 13) && (prev_noun == prev)) { \
         SAVE_PREV_VERB_NOUN \
+        led_stat[LED_STAT_DISP1] = true;\
         keypad_status = KEY_STAT_NO_CHANGE;\
         while(keypad_status != KEY_STAT_PROCEED) { \
             flight_data = uart_data_decoder(uart_str_in); \
@@ -133,6 +136,7 @@
             display_number(1, 1, flight_data.num3); \
         } \
 \
+        led_stat[LED_STAT_DISP1] = false;\
         noun = next; \
         clear_display(0, 0); \
         add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
@@ -510,6 +514,7 @@ int main() {
                 case 10:
                     if((prev_verb == 13) && (prev_noun == 9)) {
                         SAVE_PREV_VERB_NOUN
+                        led_stat[LED_STAT_DISP1] = true;
                         while(keypad_status != KEY_STAT_PROCEED){
                             flight_data = uart_data_decoder(uart_str_in);
                             led_update(flight_data);
@@ -537,6 +542,7 @@ int main() {
                                 }
                         }
 
+                        led_stat[LED_STAT_DISP1] = false;
                         clear_display(0, 0);
                         add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
                         sleep_ms(900);
@@ -626,6 +632,7 @@ int main() {
                 // Enable ascent autopilot
                 case 25:
                     if((prev_verb == 13) && ((prev_noun == 14) || (prev_noun == 18) || (prev_noun == 24))) {
+                        led_stat[LED_STAT_DISP1] = true;
                         clear_display(0, 1);
                         clear_display(1, 0);
                         clear_display(1, 1);
@@ -645,6 +652,7 @@ int main() {
                         verb = 3;
                         noun = 1;
 
+                        led_stat[LED_STAT_DISP1] = false;
                         clear_display(0, 0);
                         add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
                         sleep_ms(900);
@@ -660,6 +668,11 @@ int main() {
 
                 // Disable ascent autopilot
                 case 26:
+                    led_stat[LED_STAT_DISP1] = true;
+                    clear_display(0, 1);
+                    clear_display(1, 0);
+                    clear_display(1, 1);
+
                     send_data[0] = -2;
                     send_data[1] = -2;
                     send_data[2] = -2;
@@ -675,6 +688,7 @@ int main() {
                     verb = prev_noun;
                     noun = prev_verb;
 
+                    led_stat[LED_STAT_DISP1] = false;
                     clear_display(0, 0);
                     add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
                     sleep_ms(900);
@@ -761,6 +775,7 @@ int main() {
                     break;
 
                 case 6:
+                    led_stat[LED_STAT_DISP1] = true;
                     while(keypad_status != KEY_STAT_PROCEED) {
                         flight_data = uart_data_decoder(uart_str_in);
                         led_update(flight_data);
@@ -771,6 +786,7 @@ int main() {
                     
                     verb = prev_verb;
                     noun = prev_noun;
+                    led_stat[LED_STAT_DISP1] = false;
                     clear_display(0, 0);
                     add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
                     

@@ -25,10 +25,11 @@
 #define LED_STAT_GEA 8
 #define LED_STAT_BRK 9
 #define LED_STAT_BUZZ 10
+#define LED_STAT_DISP1 11
 
 #include "connection.h"
 
-extern bool led_stat[11];
+extern bool led_stat[12];
 extern bool blink_stat;
 extern struct repeating_timer led_blink_tmr;
 
