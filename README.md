@@ -6,14 +6,32 @@ A HW flight computer for Kerbal Space Program inspired by NASA's DSKY - interfac
 
 It consists of Python script for PC which grab data from the [kRPC mod](https://krpc.github.io/krpc/index.html), KGC's DSKY based on Raspberry Pi Pico and program for it. DSKY communicate with PC via UART, so you also need some USB-UART converter. KiCad project for DSKY is located in kicad directory.
 
-**Project is still in developement, it's pretty buggy and many of planned features are stil unimplemented!**
+**Project is still in developement, it's pretty buggy and some of planned features are stil unimplemented.**
 
 ## Features
 ### Implemented
 - Display several flight informations depending on selected Verb and Noun.
+- Ship control:
+    - SAS control
+    - RCS control
+    - Gear control
+    - Lights control
+    - Brakes control
+    - Solar panels control (extend/retract)
+    - Antennas control (extend/retract)
+    - Next stage activation
+    - Abort group activation
+- MechJeb control:
+    - Ascent guidance
 ### Planned
-- Basic ship control
-- MechJeb control
+- Ship control:
+    - Thrust control
+- MechJeb control:
+    - Landing guidance
+    - Rendezvous autopilot
+    - Docking autopilot
+    - Maneuver planner
+- Maneuver planning
 
 ## Installation
 TODO
@@ -26,7 +44,7 @@ TODO
 | Verb | Noun | Input/Output                                 | Actions                               | Notes                                                                |
 |------|------|----------------------------------------------|---------------------------------------|----------------------------------------------------------------------|
 | 00   | 00   |                                              | No op                                 |                                                                      |
-| 01   | 01   |                                              | Disconnect from server                |                                                                      |
+| 00   | 01   |                                              | Disconnect from server                |                                                                      |
 | 00   | 02   |                                              | Reboot                                |                                                                      |
 | 01   | 00   |                                              | No op                                 |                                                                      |
 | 01   | 01   | O: Altitude above sea level [m]              |                                       |                                                                      |
@@ -233,3 +251,9 @@ TODO
 | 1                | 1            | 0        | 1                    | 13  |
 | 1                | 1            | 1        | 0                    | 14  |
 | 1                | 1            | 1        | 1                    | 15  |
+
+## Error codes
+### Ascent guidance:
+- 1301: Noun doesn't exist
+- 1302: Autopilot wasn't initialized
+- 1303: Ascent profile selected in V13;N01 doesn't exist

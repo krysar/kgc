@@ -346,7 +346,7 @@ while handshake_in == "WAITING\n":
                           met = sec_to_ddhhmm(met)
                           dsky_send(met[0], met[1], met[2])
 
-                    # Noun 3 = Mass + available thurst + specific impulse
+                    # Noun 3 = Mass + available thrust + specific impulse
                     case 3:
                           dsky_send(int(vessel.mass), int(vessel.available_thrust), int(vessel.specific_impulse))
 
@@ -701,7 +701,7 @@ while handshake_in == "WAITING\n":
 
                         dsky_send(t_roll, v_roll, 0)
 
-                    # Insert autostage pre-delay, post-delay, clamp autostage thurst
+                    # Insert autostage pre-delay, post-delay, clamp autostage thrust
                     case 7:
                         if dsky_data_in[0] == -1:
                             ascent_guidance.staging_controller.enabled = False
@@ -711,7 +711,7 @@ while handshake_in == "WAITING\n":
                             ascent_guidance.staging_controller.autostage_post_delay = dsky_data_in[1]
                             ascent_guidance.staging_controller.clamp_auto_stage_thrust_pct = dsky_data_in[2]
 
-                    # Display autostage pre-delay, post-delay, clamp autostage thurst
+                    # Display autostage pre-delay, post-delay, clamp autostage thrust
                     case 8:
                         if ascent_guidance.staging_controller.enabled == False:
                             pre_delay = -1

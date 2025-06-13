@@ -495,12 +495,12 @@ int main() {
                     ASC_DISP_2_NUMS(5, 7)
                     break;
 
-                // Insert autostage: pre-delay, post-delay, clamp autostage thurst
+                // Insert autostage: pre-delay, post-delay, clamp autostage thrust
                 case 7:
                     ASC_INS_3_NUMS(6, 8)
                     break;
 
-                // Display autostage: pre-delay, post-delay, clamp autostage thurst for confirmation
+                // Display autostage: pre-delay, post-delay, clamp autostage thrust for confirmation
                 case 8:
                     ASC_DISP_3_NUMS(7, 9)
                     break;
