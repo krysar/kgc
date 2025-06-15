@@ -219,7 +219,9 @@ void display_number(uint8_t chip, uint8_t display, int64_t number) {
 // Function displays 2-digit number on one half of the display
 void display_two_digit_number(uint8_t chip, uint8_t display, uint8_t half, uint8_t number) {
     if (number > 99) {
-        return; // We're not able to display numb. > 99
+            // We're not able to display numb. > 99
+            spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[16]); // h
+            spi_send_data(chip, REG_DIGIT1 + 2 * half + 4 * display, code_table[1]); // I
     } else if ((number < 10)) { // Direct number's display if it's < 10
         if(half == 0) {
             spi_send_data(chip, REG_DIGIT0 + 2 * half + 4 * display, code_table[0]);
@@ -384,7 +386,7 @@ void welcome_message_print() {
     spi_send_data(0, REG_DIGIT6, code_table[22]); // r
     spi_send_data(1, REG_DIGIT0, code_table[0] + CODE_DP);  // 0.
     spi_send_data(1, REG_DIGIT1, code_table[4] + CODE_DP);  // 4.
-    spi_send_data(1, REG_DIGIT2, code_table[0]);  // 0
+    spi_send_data(1, REG_DIGIT2, code_table[1]);  // 1
 
     sleep_ms(2000);
 }

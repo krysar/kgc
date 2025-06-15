@@ -38,7 +38,7 @@ pico_sdk_init()
 add_executable(kgc kgc.c max7219.h max7219.c keypad.h keypad.c connection.h connection.c led.h led.c errors.h errors.c)
 
 pico_set_program_name(kgc "kgc")
-pico_set_program_version(kgc "0.4.0")
+pico_set_program_version(kgc "0.4.1")
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(kgc 0)

@@ -21,6 +21,7 @@ It consists of Python script for PC which grab data from the [kRPC mod](https://
     - Antennas control (extend/retract)
     - Next stage activation
     - Abort group activation
+- Maneuver planning
 - MechJeb control:
     - Ascent guidance
 ### Planned
@@ -31,7 +32,6 @@ It consists of Python script for PC which grab data from the [kRPC mod](https://
     - Rendezvous autopilot
     - Docking autopilot
     - Maneuver planner
-- Maneuver planning
 
 ## Installation
 TODO
@@ -44,7 +44,7 @@ TODO
 | Verb | Noun | Input/Output                                 | Actions                               | Notes                                                                |
 |------|------|----------------------------------------------|---------------------------------------|----------------------------------------------------------------------|
 | 00   | 00   |                                              | No op                                 |                                                                      |
-| 00   | 01   |                                              | Disconnect from server                |                                                                      |
+| 01   | 01   |                                              | Disconnect from server                |                                                                      |
 | 00   | 02   |                                              | Reboot                                |                                                                      |
 | 01   | 00   |                                              | No op                                 |                                                                      |
 | 01   | 01   | O: Altitude above sea level [m]              |                                       |                                                                      |
@@ -165,6 +165,24 @@ TODO
 | 12   | 23   |                                              | Retract antennas                      | Then return to previous Verb + Noun                                  |
 | 12   | 24   |                                              | Activate next stage                   | Then return to previous Verb + Noun                                  |
 | 12   | 25   |                                              | Activate abort group                  | Then return to previous Verb + Noun                                  |
+| 12   | 30   |                                              | Initialize node creation              |                                                                      |
+| 12   | 31   | I: UT - year                                 |                                       |                                                                      |
+|      |      | I: UT - day                                  |                                       |                                                                      |
+| 12   | 32   | O: UT - year                                 |                                       |                                                                      |
+|      |      | O: UT - day                                  |                                       |                                                                      |
+| 12   | 33   | I: UT - hour                                 |                                       |                                                                      |
+|      |      | I: UT - minute                               |                                       |                                                                      |
+|      |      | I: UT - second                               |                                       |                                                                      |
+| 12   | 34   | O: UT - hour                                 |                                       |                                                                      |
+|      |      | O: UT - minute                               |                                       |                                                                      |
+|      |      | O: UT - second                               |                                       |                                                                      |
+| 12   | 35   | I: Δv - prograde [m/s]                       |                                       |                                                                      |
+|      |      | I: Δv - normal [m/s]                         |                                       |                                                                      |
+|      |      | I: Δv - radial [m/s]                         |                                       |                                                                      |
+| 12   | 36   | O: Δv - prograde [m/s]                       |                                       |                                                                      |
+|      |      | O: Δv - normal [m/s]                         |                                       |                                                                      |
+|      |      | O: Δv - radial [m/s]                         |                                       |                                                                      |
+| 12   | 37   |                                              | Create node                           | Incorrect time                                                       |
 | 13   | 00   |                                              | Initialize ascent autpoilot           | MechJeb is used                                                      |
 | 13   | 01   | I: Orbit altitude [km]                       |                                       |                                                                      |
 |      |      | I: Orbit inclination [°]                     |                                       |                                                                      |

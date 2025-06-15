@@ -19,7 +19,7 @@ def sec_to_hhmmss(time_in_sec: int) -> tuple[int, int, int]:
 # Convert seconds to Kerbin days, hours and minutes
 def sec_to_ddhhmm(time_in_sec: int) -> tuple[int, int, int]:
     day = time_in_sec // 36000
-    hr = (time_in_sec // 3600) % 10
+    hr = (time_in_sec // 3600) % 6
     min = (time_in_sec // 60) % 60
     time = (day, hr, min)
 
@@ -184,7 +184,7 @@ def dec2bin(dec: int) -> list[bool]:
 
 # Main program:
 
-print("KGC 0.4.0")
+print("KGC 0.4.1")
 
 serial_port = input("Serial port? ")
 ser_conn = serial.Serial(serial_port, 115200)
@@ -193,7 +193,7 @@ ser_conn.stopbits = serial.STOPBITS_ONE
 ser_conn.parity = serial.PARITY_EVEN
 ser_conn.timeout = None
 
-krpc_conn = krpc.connect(name='KGC 0.4.0')
+krpc_conn = krpc.connect(name='KGC 0.4.1')
 if ser_conn.is_open == False:
     ser_conn.open()
 
@@ -201,6 +201,9 @@ tst = 1024
 verb = 0
 noun = 0
 dsky_data_in = [0.0, 0.0, 0.0]
+year = 0; day = 0; hr = 0; min = 0; sec = 0
+ut = 0
+pro = 0; norm = 0; rad = 0
 
 # Waiting for handshake
 print("Connecting to kgc...", end=" ")
@@ -633,6 +636,51 @@ while handshake_in == "WAITING\n":
                     # Abort
                     case 25:
                         vessel.control.abort = True
+
+                    # Node creation
+                    # Insert UT - year, day
+                    case 31:
+                        if dsky_data_in[0] >= 0:
+                            year = dsky_data_in[0]
+                            day = dsky_data_in[1]
+
+                    # Display UT - year, day
+                    case 32:
+                        dsky_send(int(year), int(day), 0)
+
+                    # Insert UT - hour, minute, second
+                    case 33:
+                        if dsky_data_in[0] >= 0:
+                            hr = dsky_data_in[0]
+                            min = dsky_data_in[1]
+                            sec = dsky_data_in[2]
+
+                    # Display UT - hour, minute, second
+                    case 34:
+                        dsky_send(int(hr), int(min), int(sec))
+
+                    # Insert prograde, normal and radial Delta v
+                    case 35:
+                        if dsky_data_in[0] >= 0:
+                            pro = dsky_data_in[0]
+                        if dsky_data_in[1] >= 0:
+                            norm = dsky_data_in[1]
+                        if dsky_data_in[2] >= 0:
+                            rad = dsky_data_in[2]
+
+                    # Display prograde, normal and radial Delta v
+                    case 36:
+                        dsky_send(int(pro), int(norm), int(rad))
+
+                    # Create node
+                    case 37:
+                        if(dsky_data_in[0] == 1):
+                            ut = year * 9203400
+                            ut += day * 21600
+                            ut += hr * 3600
+                            ut += min * 60
+                            ut += sec
+                            vessel.control.add_node(ut, pro, norm, rad)
 
             # Ascent guidance
             case 13:

@@ -1,6 +1,9 @@
 #ifndef KGC_ERRORS_H
 #define KGC_ERRORS_H
 
+// Node creation errors
+#define ERR_NOD_UNINITIALIZED 1202
+
 // Ascent autopilot errors
 #define ERR_ASC_NON_EXIST_NOUN 1301
 #define ERR_ASC_UNINITIALIZED 1302

@@ -18,6 +18,139 @@
 #include "led.h"
 #include "errors.h"
 
+#define NOD_INS_3_NUMS(prev) {\
+    if((prev_verb == 12) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+\
+        clear_display(0, 1); \
+        clear_display(1, 0); \
+        clear_display(1, 1); \
+\
+        sleep_ms(500); \
+\
+        insnms[0] = request_number(0, 1); \
+        insnms[1] = request_number(1, 0); \
+        insnms[2] = request_number(1, 1); \
+\
+        sleep_ms(100); \
+\
+        send_data[0] = insnms[0]; \
+        send_data[1] = insnms[1]; \
+        send_data[2] = insnms[2]; \
+\
+        sleep_ms(1500); \
+\
+        noun = prev + 2; \
+        send_data[0] = -2; \
+        send_data[1] = -2; \
+        send_data[2] = -2; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_NOD_UNINITIALIZED); \
+        } \
+    } \
+}
+
+#define NOD_INS_2_NUMS(prev) {\
+    if((prev_verb == 12) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+\
+        clear_display(0, 1); \
+        clear_display(1, 0); \
+        clear_display(1, 1); \
+\
+        sleep_ms(500); \
+\
+        insnms[0] = request_number(0, 1); \
+        insnms[1] = request_number(1, 0); \
+\
+        sleep_ms(100); \
+\
+        send_data[0] = insnms[0]; \
+        send_data[1] = insnms[1]; \
+        send_data[2] = -2; \
+\
+        sleep_ms(1500); \
+\
+        noun = prev + 2; \
+        send_data[0] = -2; \
+        send_data[1] = -2; \
+        send_data[2] = -2; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_NOD_UNINITIALIZED); \
+        } \
+    } \
+}
+
+#define NOD_DISP_3_NUMS(prev) {\
+    if((prev_verb == 12) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+        led_stat[LED_STAT_DISP1] = true;\
+        keypad_status = KEY_STAT_NO_CHANGE;\
+        while(keypad_status != KEY_STAT_PROCEED) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            display_number(0, 1, flight_data.num1); \
+            display_number(1, 0, flight_data.num2); \
+            display_number(1, 1, flight_data.num3); \
+        } \
+\
+        led_stat[LED_STAT_DISP1] = false;\
+        noun = prev + 2; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_NOD_UNINITIALIZED); \
+        } \
+    } \
+}
+
+#define NOD_DISP_2_NUMS(prev) {\
+    if((prev_verb == 12) && (prev_noun == prev)) { \
+        SAVE_PREV_VERB_NOUN \
+        led_stat[LED_STAT_DISP1] = true;\
+        keypad_status = KEY_STAT_NO_CHANGE;\
+        while(keypad_status != KEY_STAT_PROCEED) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            display_number(0, 1, flight_data.num1); \
+            display_number(1, 0, flight_data.num2); \
+            clear_display(1, 1); \
+        } \
+\
+        led_stat[LED_STAT_DISP1] = false;\
+        noun = prev + 2; \
+        clear_display(0, 0); \
+        add_alarm_in_ms(800, display_program, NULL, false); /* 800 ms blank, then display program */ \
+        sleep_ms(900); \
+    } else { \
+        while(keypad_status != KEY_STAT_PRG_CHANGE) { \
+            flight_data = uart_data_decoder(uart_str_in); \
+            led_update(flight_data); \
+            clear_display(0, 1); \
+            display_err_code(ERR_NOD_UNINITIALIZED); \
+        } \
+    } \
+}
+
 #define ASC_INS_3_NUMS(prev, next) {\
     if((prev_verb == 13) && (prev_noun == prev)) { \
         SAVE_PREV_VERB_NOUN \
@@ -74,7 +207,7 @@
 \
         send_data[0] = insnms[0]; \
         send_data[1] = insnms[1]; \
-        send_data[2] = 0; \
+        send_data[2] = -2; \
 \
         sleep_ms(1500); \
 \
@@ -404,12 +537,78 @@ int main() {
             break;
 
         // Basic ship control
-        case 12:
-            sleep_ms(1500);
-            verb = prev_verb;
-            noun = prev_noun;
-            clear_display(0, 0);
-            add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+        case 12:                
+            // Init node creation
+            if(noun == 30) {
+                sleep_ms(1000);
+                SAVE_PREV_VERB_NOUN
+                send_data[0] = -2; 
+                send_data[1] = -2; 
+                send_data[2] = -2; 
+                noun = 31;
+                clear_display(0, 0);
+                add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                sleep_ms(900);
+            // Insert UT - year, day
+            } else if(noun == 31) {
+                NOD_INS_2_NUMS(30)
+            // Display UT - year, day
+            } else if(noun == 32) {
+                NOD_DISP_2_NUMS(31)
+            // Insert UT - hour, minute, second
+            } else if(noun == 33) {
+                NOD_INS_3_NUMS(32)
+            // Display UT - hour, minute, second
+            } else if(noun == 34) {
+                NOD_DISP_3_NUMS(33)
+            // Insert prograde, normal and radial Delta v
+            } else if(noun == 35) {
+                NOD_INS_3_NUMS(34)
+            // Display prograde, normal and radial Delta v
+            } else if(noun == 36) {
+                NOD_DISP_3_NUMS(35)
+            // Confirm node creation
+            } else if(noun == 37) {
+                if((prev_verb == 12) && (prev_noun == 36)) {
+                        led_stat[LED_STAT_DISP1] = true;
+                        clear_display(0, 1);
+                        clear_display(1, 0);
+                        clear_display(1, 1);
+
+                        send_data[0] = -2;
+                        send_data[1] = -2;
+                        send_data[2] = -2;
+
+                        while(keypad_status != KEY_STAT_PROCEED) {
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                        }
+
+                        send_data[0] = 1;
+                        sleep_ms(1500);
+
+                        verb = 4;
+                        noun = 3;
+
+                        led_stat[LED_STAT_DISP1] = false;
+                        clear_display(0, 0);
+                        add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+                        sleep_ms(900);
+                    } else {
+                        while(keypad_status != KEY_STAT_PRG_CHANGE) {
+                            flight_data = uart_data_decoder(uart_str_in);
+                            led_update(flight_data);
+                            clear_display(0, 1);
+                            display_err_code(ERR_NOD_UNINITIALIZED);
+                        }
+                    }
+            } else {
+                sleep_ms(1500);
+                verb = prev_verb;
+                noun = prev_noun;
+                clear_display(0, 0);
+                add_alarm_in_ms(800, display_program, NULL, false); // 800 ms blank, then display program
+            }
 
             break;
 
