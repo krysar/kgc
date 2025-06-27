@@ -1,3 +1,5 @@
 (sym_lib_table
-  (lib (name "kgc-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/kgc-eagle-import.kicad_sym")(options "")(descr "")(disabled))
+  (version 7)
+  (lib (name "kgc-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/kgc-eagle-import.kicad_sym")(options "")(descr "")(disabled)(hidden))
+  (lib (name "MCU_RaspberryPi_RP2350")(type "KiCad")(uri "${KIPRJMOD}/MCU_RaspberryPi_RP2350.kicad_sym")(options "")(descr ""))
 )

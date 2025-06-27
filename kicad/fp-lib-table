@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "RP2350_80QFN")(type "KiCad")(uri "${KIPRJMOD}/RP2350_80QFN.pretty")(options "")(descr ""))
+  (lib (name "other_things")(type "KiCad")(uri "${KIPRJMOD}/other_things.pretty")(options "")(descr ""))
+)

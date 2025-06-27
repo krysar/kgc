@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.762,
-          "height": 1.524,
-          "width": 1.524
+          "drill": 0.3,
+          "height": 0.65,
+          "width": 0.65
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -49,7 +49,7 @@
         "silk_text_upright": false,
         "zones": {
           "45_degree_only": false,
-          "min_clearance": 0.508
+          "min_clearance": 0.3
         }
       },
       "diff_pair_dimensions": [
@@ -60,11 +60,78 @@
         }
       ],
       "drc_exclusions": [
-        "clearance|158750000|69050000|56ab813f-3828-4ae2-a880-1ba75593d001|d788569e-26f7-4953-955d-5a1cf8d5155f",
-        "clearance|158750000|69050000|d788569e-26f7-4953-955d-5a1cf8d5155f|56ab813f-3828-4ae2-a880-1ba75593d001",
-        "clearance|160020000|104070000|6ced450f-7578-4ff8-a310-800f4192e3ad|773941e5-9d5a-4930-af72-83876dee949b",
-        "clearance|160020000|104070000|773941e5-9d5a-4930-af72-83876dee949b|6ced450f-7578-4ff8-a310-800f4192e3ad",
-        "clearance|165100000|61760000|56ab813f-3828-4ae2-a880-1ba75593d001|d788569e-26f7-4953-955d-5a1cf8d5155f"
+        [
+          "clearance|152150000|34750000|5569fb94-592e-4888-9e2b-4d9c805e61a1|05b12128-8130-4fb7-a33a-b347814d6fa0",
+          "USB"
+        ],
+        [
+          "clearance|152150000|36100000|fa870746-b137-4cb1-92e2-db0ac0bc32dc|b48ac8fe-580a-4783-9fb2-f9f572070fa8",
+          "USB"
+        ],
+        [
+          "clearance|153000000|34750000|11a03d1f-3075-4047-ad39-a1f034788268|5569fb94-592e-4888-9e2b-4d9c805e61a1",
+          "USB"
+        ],
+        [
+          "clearance|153000000|36100000|b48ac8fe-580a-4783-9fb2-f9f572070fa8|74876027-aa41-4f6b-83a1-faaed2cfc34e",
+          "USB"
+        ],
+        [
+          "clearance|153850000|34750000|dcf7c8e4-a415-430f-b257-72eaa8f47a2a|11a03d1f-3075-4047-ad39-a1f034788268",
+          "USB"
+        ],
+        [
+          "clearance|153850000|36100000|74876027-aa41-4f6b-83a1-faaed2cfc34e|df2b8653-9e88-429c-abd1-5719779ec138",
+          "USB"
+        ],
+        [
+          "clearance|177150000|34750000|a7ef56be-d20d-4cfb-8270-f2e9076ae4e3|21003343-dc5b-4e42-b599-bda44326150f",
+          "USB"
+        ],
+        [
+          "clearance|177150000|36100000|7da883f5-c6c4-4f27-8931-2398d5bd12dd|143ed53b-2467-476e-a223-f36d926c36bf",
+          "USB"
+        ],
+        [
+          "clearance|178000000|34750000|bd59a72d-9d2a-42e3-b962-31b5065d7e79|a7ef56be-d20d-4cfb-8270-f2e9076ae4e3",
+          "USB"
+        ],
+        [
+          "clearance|178000000|36100000|143ed53b-2467-476e-a223-f36d926c36bf|299fa6fd-8d1e-42b1-bee8-7f741702636e",
+          "USB"
+        ],
+        [
+          "clearance|178850000|34750000|d8245d88-4523-48f9-91ba-111540d0732e|bd59a72d-9d2a-42e3-b962-31b5065d7e79",
+          "USB"
+        ],
+        [
+          "clearance|178850000|36100000|299fa6fd-8d1e-42b1-bee8-7f741702636e|1a58aa8c-dbe0-4b83-b66f-b7ce41a46fac",
+          "USB"
+        ],
+        [
+          "footprint_type_mismatch|188537333|89632000|74eff7d7-9535-4e45-a501-433e5160d3e4|00000000-0000-0000-0000-000000000000",
+          "OK"
+        ],
+        [
+          "lib_footprint_mismatch|188537333|89632000|74eff7d7-9535-4e45-a501-433e5160d3e4|00000000-0000-0000-0000-000000000000",
+          "Changed via size, less then 0.3 mm is pretty expensive"
+        ],
+        [
+          "silk_edge_clearance|148405000|30000000|bfa70a99-9d1d-4213-93cc-a1f67da8c194|fadce893-cf38-4433-a124-11876a9715a6",
+          "USB is on the edge of the PCB"
+        ],
+        [
+          "silk_edge_clearance|157595000|30000000|bfa70a99-9d1d-4213-93cc-a1f67da8c194|873a9386-8dd4-4b82-a7d0-ba7409b8d487",
+          "USB is on the edge of the PCB"
+        ],
+        [
+          "silk_edge_clearance|173405000|30000000|bfa70a99-9d1d-4213-93cc-a1f67da8c194|c83b7ee9-d3ec-40dd-a576-3a4204b8b07f",
+          "USB is on the edge of the PCB"
+        ],
+        [
+          "silk_edge_clearance|182595000|30000000|bfa70a99-9d1d-4213-93cc-a1f67da8c194|fe4b894d-4899-4417-9971-fb8fae32a868",
+          "USB is on the edge of the PCB"
+        ]
       ],
       "meta": {
         "version": 2
@@ -76,16 +143,19 @@
         "copper_edge_clearance": "error",
         "copper_sliver": "warning",
         "courtyards_overlap": "error",
+        "creepage": "error",
         "diff_pair_gap_out_of_range": "error",
         "diff_pair_uncoupled_length_too_long": "error",
         "drill_out_of_range": "error",
         "duplicate_footprints": "warning",
         "extra_footprint": "warning",
         "footprint": "error",
+        "footprint_filters_mismatch": "ignore",
         "footprint_symbol_mismatch": "warning",
         "footprint_type_mismatch": "error",
         "hole_clearance": "error",
         "hole_near_hole": "error",
+        "hole_to_hole": "error",
         "holes_co_located": "warning",
         "invalid_outline": "error",
         "isolated_copper": "warning",
@@ -96,9 +166,11 @@
         "lib_footprint_mismatch": "warning",
         "malformed_courtyard": "error",
         "microvia_drill_out_of_range": "error",
+        "mirrored_text_on_front_layer": "warning",
         "missing_courtyard": "ignore",
         "missing_footprint": "warning",
         "net_conflict": "warning",
+        "nonmirrored_text_on_back_layer": "warning",
         "npth_inside_courtyard": "ignore",
         "padstack": "error",
         "pth_inside_courtyard": "ignore",
@@ -110,10 +182,13 @@
         "solder_mask_bridge": "error",
         "starved_thermal": "error",
         "text_height": "warning",
+        "text_on_edge_cuts": "error",
         "text_thickness": "warning",
         "through_hole_pad_without_hole": "error",
         "too_many_vias": "error",
+        "track_angle": "error",
         "track_dangling": "warning",
+        "track_segment_length": "error",
         "track_width": "error",
         "tracks_crossing": "error",
         "unconnected_items": "error",
@@ -128,11 +203,12 @@
         "min_clearance": 0.0,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.0,
+        "min_groove_width": 0.0,
         "min_hole_clearance": 0.25,
         "min_hole_to_hole": 0.25,
-        "min_microvia_diameter": 0.2,
+        "min_microvia_diameter": 0.3,
         "min_microvia_drill": 0.1,
-        "min_resolved_spokes": 2,
+        "min_resolved_spokes": 1,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
@@ -147,10 +223,11 @@
       },
       "teardrop_options": [
         {
-          "td_onpadsmd": true,
+          "td_onpthpad": true,
           "td_onroundshapesonly": false,
+          "td_onsmdpad": true,
           "td_ontrackend": false,
-          "td_onviapad": true
+          "td_onvia": true
         }
       ],
       "teardrop_parameters": [
@@ -233,6 +310,7 @@
       "mfg": "",
       "mpn": ""
     },
+    "layer_pairs": [],
     "layer_presets": [],
     "viewports": []
   },
@@ -425,21 +503,37 @@
       "different_unit_net": "error",
       "duplicate_reference": "error",
       "duplicate_sheet_names": "error",
+      "endpoint_off_grid": "warning",
       "extra_units": "error",
+      "footprint_filter": "ignore",
+      "footprint_link_issues": "warning",
+      "four_way_junction": "ignore",
       "global_label_dangling": "warning",
       "hier_label_mismatch": "error",
       "label_dangling": "error",
+      "label_multiple_wires": "warning",
       "lib_symbol_issues": "warning",
+      "lib_symbol_mismatch": "warning",
+      "missing_bidi_pin": "warning",
+      "missing_input_pin": "warning",
+      "missing_power_pin": "error",
+      "missing_unit": "warning",
       "multiple_net_names": "warning",
       "net_not_bus_member": "warning",
       "no_connect_connected": "warning",
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
-      "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_not_driven": "ignore",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
+      "same_local_global_label": "warning",
+      "similar_label_and_power": "warning",
       "similar_labels": "warning",
+      "similar_power": "warning",
+      "simulation_model_issue": "ignore",
+      "single_global_label": "ignore",
       "unannotated": "error",
+      "unconnected_wire_endpoint": "warning",
       "unit_value_mismatch": "error",
       "unresolved_variable": "error",
       "wire_dangling": "error"
@@ -451,13 +545,13 @@
   },
   "meta": {
     "filename": "kgc.kicad_pro",
-    "version": 1
+    "version": 3
   },
   "net_settings": {
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.2,
+        "clearance": 0.12,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -466,408 +560,129 @@
         "microvia_drill": 0.1,
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 2147483647,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.25,
-        "via_diameter": 0.8,
-        "via_drill": 0.4,
+        "via_diameter": 0.6,
+        "via_drill": 0.35,
         "wire_width": 6
       },
       {
         "bus_width": 12,
-        "clearance": 0.45,
+        "clearance": 0.13,
         "diff_pair_gap": 0.25,
-        "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
         "name": "Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 2,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 1.27,
-        "via_diameter": 1.0,
-        "via_drill": 0.5,
+        "track_width": 0.2,
+        "via_diameter": 0.7,
+        "via_drill": 0.35,
         "wire_width": 6
       },
       {
-        "bus_width": 12,
-        "clearance": 0.4,
-        "diff_pair_gap": 0.25,
-        "diff_pair_via_gap": 0.25,
-        "diff_pair_width": 0.2,
-        "line_style": 0,
-        "microvia_diameter": 0.3,
-        "microvia_drill": 0.1,
-        "name": "Signal",
+        "name": "UART",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "clearance": 0.2,
+        "diff_pair_width": 0.8,
+        "name": "USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 1,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.635,
-        "via_diameter": 1.0,
-        "via_drill": 0.5,
-        "wire_width": 6
+        "track_width": 0.8,
+        "via_diameter": 0.8,
+        "via_drill": 0.4
       }
     ],
     "meta": {
-      "version": 3
+      "version": 4
     },
     "net_colors": null,
     "netclass_assignments": null,
     "netclass_patterns": [
       {
         "netclass": "Power",
-        "pattern": "+5V"
+        "pattern": "+3V3"
       },
       {
         "netclass": "Power",
-        "pattern": "BUZZ"
+        "pattern": "GND"
+      },
+      {
+        "netclass": "UART",
+        "pattern": "/UART0_RX"
+      },
+      {
+        "netclass": "UART",
+        "pattern": "/UART0_TX"
       },
       {
         "netclass": "Power",
-        "pattern": "GND1"
+        "pattern": "VBUS"
       },
       {
-        "netclass": "Power",
-        "pattern": "GND2"
+        "netclass": "USB",
+        "pattern": "/USB D+"
       },
       {
-        "netclass": "Power",
-        "pattern": "GND3"
+        "netclass": "USB",
+        "pattern": "/USB D-"
       },
       {
-        "netclass": "Power",
-        "pattern": "Net-(IC2-Pad18)"
+        "netclass": "UART",
+        "pattern": "/UART1_TX"
       },
       {
-        "netclass": "Power",
-        "pattern": "Net-(IC3-Pad18)"
+        "netclass": "UART",
+        "pattern": "/UART1_RX"
       },
       {
-        "netclass": "Signal",
-        "pattern": "CLK"
+        "netclass": "UART",
+        "pattern": "/UART1_RTS"
       },
       {
-        "netclass": "Signal",
-        "pattern": "DIN"
+        "netclass": "UART",
+        "pattern": "/UART1_CTS"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_0"
+        "netclass": "USB",
+        "pattern": "/USB/USB_D-"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_1"
+        "netclass": "USB",
+        "pattern": "/USB/USB_D+"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_2"
+        "netclass": "USB",
+        "pattern": "/USB/USB_UART_D-"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_3"
+        "netclass": "USB",
+        "pattern": "/USB/USB_UART_D+"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_4"
+        "netclass": "UART",
+        "pattern": "/USB/UART_TXD"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_5"
+        "netclass": "UART",
+        "pattern": "/USB/UART_RXD"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_6"
+        "netclass": "UART",
+        "pattern": "/USB/~{UART_RTS}"
       },
       {
-        "netclass": "Signal",
-        "pattern": "IC2_DIG_7"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_A"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_B"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_C"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_D"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_DP"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_E"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_F"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC2_SEG_G"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_0"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_1"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_2"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_3"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_4"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_5"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_6"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_DIG_7"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_A"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_B"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_C"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_D"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_DP"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_E"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_F"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "IC3_SEG_G"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_C1"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_C2"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_C3"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_C4"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_R1"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_R2"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_R3"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "KBD_R4"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_BRK"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_CON"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_ELC"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_FLD"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_GEA"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_LFO"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_MOP"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_OTR"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_RCS"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LED_SAS"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LOAD_1"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "LOAD_2"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D1-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D10-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D2-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D3-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D4-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D5-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D6-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D7-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D8-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "Net-(D9-Pad2)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "RXD"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "TXD"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad13)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad17)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad28)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad30)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad33)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad35)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad36)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad37)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad38)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad40)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad41)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad42)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad43)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC1-Pad8)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC2-Pad24)"
-      },
-      {
-        "netclass": "Signal",
-        "pattern": "unconnected-(IC3-Pad24)"
+        "netclass": "UART",
+        "pattern": "/USB/~{UART_CTS}"
       }
     ]
   },
@@ -876,18 +691,116 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "gerbers/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "../../3d/dsky.step",
       "svg": "",
-      "vrml": ""
+      "vrml": "../../3d/dsky.wrl"
     },
     "page_layout_descr_file": "${KICAD_USER_TEMPLATE_DIR}/default.kicad_wks"
   },
   "schematic": {
     "annotate_start_num": 0,
+    "bom_export_filename": "bom.csv",
+    "bom_fmt_presets": [],
+    "bom_fmt_settings": {
+      "field_delimiter": ";",
+      "keep_line_breaks": false,
+      "keep_tabs": false,
+      "name": "Středníky",
+      "ref_delimiter": ",",
+      "ref_range_delimiter": "",
+      "string_delimiter": "'"
+    },
+    "bom_presets": [],
+    "bom_settings": {
+      "exclude_dnp": false,
+      "fields_ordered": [
+        {
+          "group_by": false,
+          "label": "Reference",
+          "name": "Reference",
+          "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Qty",
+          "name": "${QUANTITY}",
+          "show": true
+        },
+        {
+          "group_by": true,
+          "label": "Value",
+          "name": "Value",
+          "show": true
+        },
+        {
+          "group_by": true,
+          "label": "DNP",
+          "name": "${DNP}",
+          "show": true
+        },
+        {
+          "group_by": true,
+          "label": "Exclude from BOM",
+          "name": "${EXCLUDE_FROM_BOM}",
+          "show": true
+        },
+        {
+          "group_by": true,
+          "label": "Exclude from Board",
+          "name": "${EXCLUDE_FROM_BOARD}",
+          "show": true
+        },
+        {
+          "group_by": true,
+          "label": "Footprint",
+          "name": "Footprint",
+          "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Datasheet",
+          "name": "Datasheet",
+          "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Pins",
+          "name": "Sim.Pins",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Device",
+          "name": "Sim.Device",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Popis",
+          "name": "Description",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "#",
+          "name": "${ITEM_NUMBER}",
+          "show": false
+        }
+      ],
+      "filter_string": "",
+      "group_symbols": true,
+      "include_excluded_from_bom": true,
+      "name": "",
+      "sort_asc": true,
+      "sort_field": "Reference"
+    },
+    "connection_grid_size": 50.0,
     "drawing": {
+      "dashed_lines_dash_length_ratio": 12.0,
+      "dashed_lines_gap_length_ratio": 3.0,
       "default_line_thickness": 6.0,
       "default_text_size": 50.0,
       "field_names": [],
@@ -898,6 +811,11 @@
       "intersheets_ref_suffix": "",
       "junction_size_choice": 3,
       "label_size_ratio": 0.375,
+      "operating_point_overlay_i_precision": 3,
+      "operating_point_overlay_i_range": "~A",
+      "operating_point_overlay_v_precision": 3,
+      "operating_point_overlay_v_range": "~V",
+      "overbar_offset_ratio": 1.23,
       "pin_symbol_size": 25.0,
       "text_offset_ratio": 0.15
     },
@@ -918,15 +836,33 @@
     },
     "page_layout_descr_file": "${KICAD_USER_TEMPLATE_DIR}/default.kicad_wks",
     "plot_directory": "",
+    "space_save_all_events": true,
     "spice_adjust_passive_values": false,
+    "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",
+    "spice_model_current_sheet_as_root": true,
+    "spice_save_all_currents": false,
+    "spice_save_all_dissipations": false,
+    "spice_save_all_voltages": false,
     "subpart_first_id": 65,
     "subpart_id_separator": 0
   },
   "sheets": [
     [
       "f4634818-a231-47ca-b449-9b6779a8ef65",
-      ""
+      "Root"
+    ],
+    [
+      "58c78f01-1528-4e8d-89cf-77dd43de1a38",
+      "USB"
+    ],
+    [
+      "9807bdc0-f9ad-4d7b-a0d2-261a6556c0a3",
+      "Keyboard"
+    ],
+    [
+      "203467e5-7551-4a54-b148-84bb20bb3b83",
+      "Displays and LEDs"
     ]
   ],
   "text_variables": {}
